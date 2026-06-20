@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+WORKBENCH_REPO="$(cd "$(dirname "$0")/.." && pwd)"
+TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/llm-workbench-install.XXXXXX")"
+TARGET_REPO="$TMP_ROOT/target"
+
+cleanup() {
+  rm -rf "$TMP_ROOT"
+}
+trap cleanup EXIT
+
+mkdir -p "$TARGET_REPO"
+git -C "$TARGET_REPO" init -q
+git -C "$TARGET_REPO" config user.name "llm-workbench smoke test"
+git -C "$TARGET_REPO" config user.email "llm-workbench-smoke@example.invalid"
+
+bash "$WORKBENCH_REPO/scripts/install.sh" "$TARGET_REPO"
+
+test -f "$TARGET_REPO/AGENTS.md"
+test -d "$TARGET_REPO/.agentic/00.chat"
+test -d "$TARGET_REPO/scripts/00.chat"
+test -d "$TARGET_REPO/scripts/shared/harness"
+
+npm --prefix "$TARGET_REPO" run --silent chat:list >/dev/null
+
+git -C "$TARGET_REPO" add AGENTS.md package.json .agentic scripts
+git -C "$TARGET_REPO" commit -q -m "Install llm-workbench harness"
+
+(
+  cd "$TARGET_REPO"
+  AGENTIC_CHAT_WORKTREE_ROOT="$TMP_ROOT/worktrees" \
+  CHAT_COPY_PROMPT=skip CHAT_CLEANUP_EMPTY_BRANCHES=skip \
+    npm run --silent chat:new -- "smoke test first chat startup" >/dev/null
+)
+
+find "$TMP_ROOT/worktrees" -path '*/commitLogs/*/README.md' -type f | grep -q .
+
+echo "Install smoke test passed."
