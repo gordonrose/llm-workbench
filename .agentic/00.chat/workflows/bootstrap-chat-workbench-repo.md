@@ -1,14 +1,24 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: workflow
-purpose: Govern bootstrapping the portable chat workbench into an upstream repo.
-domain: bootstrap
-portability: llm-workbench-required
-used_by:
-  - .agentic/shared/standards/upstream-repo-bootstrap.md
-  - scripts/00.chat/bootstrap/audit-chat-bootstrap-file-set/script.sh
+  schema: agentic-artifact/v2
+  id: chat.workflows.bootstrap-chat-workbench-repo
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: bootstrap
+  disciplines:
+  - agentic
+  kind: workflow
+  purpose: Govern bootstrapping the portable chat workbench into an upstream repo.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: shared.standard.upstream-repo-bootstrap
+    path: .agentic/shared/standards/upstream-repo-bootstrap.md
+  - id: chat.script.bootstrap.audit-chat-bootstrap-file-set
+    path: scripts/00.chat/bootstrap/audit-chat-bootstrap-file-set/script.sh
 -->
-
 # Bootstrap Chat Workbench Repo Workflow
 
 ## Use When
@@ -22,6 +32,9 @@ Create the first minimal usable open-source chat workbench repo so engineers can
 read, install, test, and run the portable chat harness from the upstream repo.
 
 This workflow uses `.agentic/shared/standards/upstream-repo-bootstrap.md`.
+It also uses
+`.agentic/00.chat/standards/llm-workbench-public-beta-contract.md` for the
+public `llm-workbench` contract.
 
 ## Required Gates
 
@@ -54,21 +67,15 @@ Initial candidate paths:
 
 - `AGENTS.md` as an upstream template, not a direct source-repo copy
 - `.agentic/00.chat/`
-- `.agentic/shared/checklists/`
-- `.agentic/shared/gates/`
 - `.agentic/shared/standards/`
-- `.agentic/shared/workflows/` entries required by chat startup, commit, and
-  promotion compatibility
-- `.agentic/harness/` standards and workflows required by metadata,
-  deterministic process, governed script, and harness-maintenance checks
+- `.agentic/shared/workflows/` entries required by cross-layer process and
+  capability resolution
 - `package.json` chat command scripts as an upstream template, not a direct
   source-repo copy
 - `scripts/00.chat/` canonical chat capability scripts required by the audit
-- `scripts/shared/harness/` gates required by chat startup, commit, classifier,
+- `scripts/01.harness/` gates required by chat startup, commit,
   governed script, and deterministic process checks
-- `docs/harness/architecture/public-chat-workbench-adrs.md`
-- ADRs listed in `docs/harness/architecture/public-chat-workbench-adrs.md`
-- `docs/harness/architecture/chat-workbench-public-repo-readiness.md`
+- `docs/00.chat/`
 
 Do not copy the source repo `README.md` directly. It describes the source repo,
 not the upstream workbench.
@@ -89,11 +96,12 @@ outside engineer would use it:
 - `scripts/install.sh`
 - `scripts/uninstall.sh`
 - `tests/smoke-test-install.sh`
+- `docs/public-beta-contract.md`
 
 Starter templates for those files live in:
 
 ```txt
-docs/harness/bootstrap/llm-workbench-template/root/
+docs/00.chat/bootstrap/llm-workbench-template/root/
 ```
 
 The install smoke test must install the workbench into a throwaway Git repo,
@@ -104,20 +112,22 @@ Use `scripts/00.chat/bootstrap/audit-chat-bootstrap-file-set/script.sh` to disti
 required scripts from candidate unreferenced scripts before copying scripts
 into the upstream repo.
 
-Use `docs/harness/architecture/chat-workbench-public-repo-readiness.md` to
-separate files that can be copied as-is from files that must be transformed for
-the public repo.
+Use `docs/00.chat/llm-workbench-acceptance-matrix.md` to verify the current
+public export boundary and the checks that enforce it.
 
 Before writing, run the dry-run planner:
 
 ```bash
-bash scripts/00.chat/upstream/bootstrap-llm-workbench-repo/script.sh \
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/upstream/bootstrap-llm-workbench-repo/script.sh \
   --target <upstream-repo> \
   --dry-run
 ```
 
 Only run `--apply` after reviewing a clean plan. Apply mode must refuse to
 write when the plan contains conflicts.
+
+Before commit, complete
+`.agentic/00.chat/checklists/llm-workbench-public-beta.md`.
 
 ## Required Exclusions
 

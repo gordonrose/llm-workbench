@@ -1,14 +1,29 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: standard
-purpose: Define governed conflict classification and resolution during chat refresh from main.
-domain: main-refresh
-portability: llm-workbench-required
-used_by:
-  - .agentic/00.chat/workflows/chat-refresh-from-main.md
-  - scripts/00.chat/main-refresh/apply-rehearsed-refresh/script.sh
+  schema: agentic-artifact/v2
+  id: chat.standards.main-refresh-conflict-types
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: main-refresh
+  disciplines:
+  - agentic
+  kind: standard
+  purpose: Define governed conflict classification and resolution during chat refresh
+    from main.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: chat.workflows.chat-refresh-from-main
+    path: .agentic/00.chat/workflows/chat-refresh-from-main.md
+  - id: chat.script.main-refresh.apply-rehearsed-refresh
+    path: scripts/00.chat/main-refresh/apply-rehearsed-refresh/script.sh
+  - id: chat.script.main-refresh.classify-conflict
+    path: scripts/00.chat/main-refresh/classify-conflict/script.sh
+  - id: chat.script.main-refresh.verify-conflict-audit
+    path: scripts/00.chat/main-refresh/verify-conflict-audit/script.sh
 -->
-
 # Main Refresh Conflict Types
 
 ## Purpose
@@ -18,6 +33,16 @@ Classify conflicts found while refreshing a chat branch from `main`.
 Use this standard after preflight reports conflicts and before resolving any
 conflicted path. Resolve only conflicts with a deterministic action. If no type
 fits, stop and propose either a new type or an expansion of an existing type.
+
+Use the deterministic classifier for known conflict shapes:
+
+```bash
+bash scripts/00.chat/main-refresh/classify-conflict/script.sh <conflicted-path>
+```
+
+The classifier is a guardrail, not a substitute for judgment. If the classifier
+returns `normal-repo-conflict` or `unsupported-conflict`, stop before resolving
+unless the user approves the next step or the harness is updated.
 
 ## Classification Method
 
@@ -50,7 +75,7 @@ preflight result.
 Use:
 
 ```bash
-bash scripts/00.chat/session-log/record-main-refresh-conflict/script.sh \
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-main-refresh-conflict/script.sh \
   --path <conflicted-path> \
   --type <conflict-type> \
   --reason <classification-reason> \
@@ -83,7 +108,9 @@ After every conflicted path has a `## Main Refresh Conflicts` audit entry and
 the required checks pass, apply the preflight branch automatically with:
 
 ```bash
-bash scripts/00.chat/main-refresh/apply-rehearsed-refresh/script.sh <preflight-branch>
+bash scripts/00.chat/main-refresh/verify-conflict-audit/script.sh \
+  --path <conflicted-path> ...
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/main-refresh/apply-rehearsed-refresh/script.sh <preflight-branch>
 ```
 
 Stop before applying if:
@@ -101,7 +128,7 @@ Do not ask for a second approval when none of those stop conditions apply.
 
 | Type | Detect | Deterministic action |
 | --- | --- | --- |
-| `ownership-migration-conflict` | One side converts a legacy path to a compatibility pointer while the other side improves the legacy path | Keep the compatibility pointer; migrate useful improvements into the canonical owner |
+| `ownership-migration-conflict` | One side moves behavior to a canonical owner while the other side improves the old path | Keep the canonical owner; migrate useful improvements into it |
 | `generated-artifact-conflict` | Conflict is only in a generated artifact that can be recreated from source evidence | Remove or restore the generated artifact according to its governing workflow, then regenerate only if an explicit output is requested |
 | `session-bookkeeping-conflict` | Conflict is limited to the current chat session log or chat-owned bookkeeping | Preserve current session evidence; never discard recorded commits or retention markers |
 | `retired-artifact-delete-modify-conflict` | Chat branch deletes a retired generated artifact while `main` modifies it | Keep the deletion when the retirement ADR/workflow is present; preserve useful policy references in canonical docs if needed |
@@ -116,21 +143,20 @@ Do not ask for a second approval when none of those stop conditions apply.
 ### ownership-migration-conflict
 
 Detect:
-- A legacy workflow, checklist, or script path has become a compatibility
-  pointer on one side.
-- The other side keeps the legacy path as the implementation and adds useful
+- A workflow, checklist, or script path has moved to a canonical owner on one
+  side.
+- The other side keeps the old path as the implementation and adds useful
   governance, checks, or stricter safety behavior.
 
 Examples:
-- `.agentic/shared/workflows/local-convergence.md` points to
-  `.agentic/00.chat/workflows/chat-promote-to-main.md` on the chat branch,
-  while `main` adds verifier-based local convergence rules to the old shared
-  path.
+- `.agentic/00.chat/workflows/chat-promote-to-main.md` owns chat promotion on
+  one side, while the other side adds verifier-based local convergence rules to
+  a retired shared workflow path.
 
 Deterministic action:
-- Keep the legacy path as a compatibility pointer.
+- Keep the canonical owner path.
 - Migrate useful main-side improvements into the canonical owner named by the
-  pointer.
+  current workflow or artifact metadata.
 - Adjust layer names, workflow paths, and exact blocked responses to the
   canonical owner.
 

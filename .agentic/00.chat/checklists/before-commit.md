@@ -1,13 +1,22 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: checklist
-purpose: Define the required checks before committing approved chat task work.
-domain: git
-portability: llm-workbench-required
-used_by:
-  - .agentic/shared/checklists/before-commit.md
+  schema: agentic-artifact/v2
+  id: chat.checklists.before-commit
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: git
+  disciplines:
+  - agentic
+  kind: checklist
+  purpose: Define the required checks before committing approved chat task work.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: chat.workflows.chat-commit
+    path: .agentic/00.chat/workflows/chat-commit.md
 -->
-
 # Chat Before-Commit Checklist
 
 Use this before committing approved chat task work.
@@ -41,7 +50,7 @@ introduced the missing files, then rerun this checklist.
 Run:
 
 ```bash
-bash scripts/shared/harness/check-deterministic-process-drift.sh --staged
+bash scripts/01.harness/check-deterministic-process-drift.sh --staged
 ```
 
 <!-- deterministic-check: allow reason="requires human review and approval before editing process prose" -->
@@ -53,12 +62,28 @@ script or gate, or keeping the prose with an allow marker and reason.
 Run:
 
 ```bash
-bash scripts/shared/harness/check-artifact-metadata-headers.sh --staged-added
+bash scripts/01.harness/artifact-metadata/check-headers/script.sh --staged-added
 ```
 
 New scripts and harness/process Markdown documents must declare metadata
 headers before entering the repo. Existing files are backfilled in focused
 batches.
+
+## Optional Commit Gates
+
+If this repo defines an optional layer-level commit gate, run that gate
+according to the repo's local instructions. The base llm-workbench install does
+not require any product, deployment, retrieval, or rulebook layer.
+
+## llm-workbench Public-Beta Contract
+
+If the change touches public export, install/uninstall, chat startup, assistant
+adapters, transcript metrics, cost metrics, public templates, or portability
+validation, complete:
+
+```bash
+.agentic/00.chat/checklists/llm-workbench-public-beta.md
+```
 
 ## Commit Log Deletions
 
@@ -83,7 +108,7 @@ commit logs that record commits or are explicitly marked for retention.
 For structured manual session-log entries, use:
 
 ```bash
-bash scripts/00.chat/session-log/update-chat-log/script.sh <entry-type> <summary> <detail>
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/update-chat-log/script.sh <entry-type> <summary> <detail>
 ```
 
 ## ADR Disposition
@@ -97,7 +122,7 @@ bash scripts/00.chat/session-log/update-chat-log/script.sh <entry-type> <summary
 Run:
 
 ```bash
-bash scripts/shared/harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/prepare-chat-session-before-commit/script.sh
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/prepare-chat-session-before-commit/script.sh
 ```
 
 Do not commit if the gate fails.
@@ -107,18 +132,18 @@ Do not commit if the gate fails.
 Run:
 
 ```bash
-bash scripts/shared/harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-chat-commit/script.sh <sha> <message> <summary> [adr-impact]
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-chat-commit/script.sh <sha> <message> <summary> [adr-impact]
 ```
 
 Record every commit in the chat. The latest recorded commit is treated as the
 current endpoint for chat duration and session metrics.
 
-The recorder must estimate chat-token metrics from `CHAT_TRANSCRIPT_BYTES`,
-`codex_session_log_path`, or a discovered Codex JSONL session log. Never
-substitute the session log file size. If no transcript source can be supplied or
-discovered, stop before recording the commit unless the current workflow
-explicitly permits `ALLOW_MISSING_CHAT_TRANSCRIPT_METRICS=yes` for a legacy or
-recovery case.
+The recorder should estimate chat-token metrics from `CHAT_TRANSCRIPT_BYTES`,
+neutral transcript metadata, or an explicit assistant adapter such as Codex
+JSONL discovery. Never substitute the session log file size. If no transcript
+source can be supplied or discovered, portable mode records token metrics as
+unavailable. Strict mode may still stop before recording the commit when exact
+metrics are required.
 
 The recorder may estimate chat cost from the estimated chat-token metric and the
 checked-in pricing snapshot. Treat `estimated_chat_cost` as an approximate
@@ -130,7 +155,7 @@ If `record-chat-commit.sh` leaves only session bookkeeping dirty, prior explicit
 write permission for the chat authorizes the bookkeeping checkpoint commit:
 
 ```bash
-bash scripts/shared/harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/checkpoint-chat-session-log/script.sh
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/checkpoint-chat-session-log/script.sh
 ```
 
 <!-- deterministic-check: allow reason="checkpoint helper enforces file scope; prose states the human-readable policy" -->
@@ -159,7 +184,7 @@ that as recovery. Import only explicit approved paths into the chat-owned
 worktree before continuing:
 
 ```bash
-bash scripts/shared/harness/run-governed-script.sh --approved-action \
+bash scripts/01.harness/run-governed-script.sh --approved-action \
   scripts/00.chat/recovery/import-active-paths-to-chat-worktree/script.sh \
   --session-log <session-log> \
   --source-worktree <active-worktree> \

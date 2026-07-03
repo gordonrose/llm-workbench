@@ -1,16 +1,31 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# agentic-script:
-#   owner: 00.chat
-#   purpose: Create chat branch, session log, prompt, and chat-owned worktree.
+# agentic-artifact:
+#   schema: agentic-artifact/v2
+#   id: chat.script.startup.start-chat-session
+#   version: 1
+#   status: active
+#   layer: 00.chat
 #   domain: startup
-#   portability: llm-workbench-required
+#   disciplines:
+#   - agentic
+#   kind: script
+#   purpose: Create chat branch, session log, prompt, and chat-owned worktree.
+#   portability:
+#     class: required
+#     targets:
+#     - llm-workbench
 #   used_by:
-#     - scripts/00.chat/startup/start-new-chat/script.sh
-#     - .agentic/00.chat/workflows/chat-start.md
-#   effects: branches, worktrees, writes-files, stages-files
-
+#   - id: chat.script.startup.start-new-chat
+#     path: scripts/00.chat/startup/start-new-chat/script.sh
+#   - id: chat.workflows.chat-start
+#     path: .agentic/00.chat/workflows/chat-start.md
+#   effects:
+#   - branches
+#   - worktrees
+#   - writes-files
+#   - stages-files
 AGENTIC_ENV_FILE=".agentic/env.local"
 
 # shellcheck source=../../session-log/paths/lib.sh
@@ -35,6 +50,15 @@ fi
 if [ "$CHAT_CLEANUP_EMPTY_BRANCHES_WAS_SET" = "yes" ]; then
   CHAT_CLEANUP_EMPTY_BRANCHES="$CHAT_CLEANUP_EMPTY_BRANCHES_SHELL_VALUE"
 fi
+
+OUTPUT_FORMAT="text"
+
+case "${1:-}" in
+  --json)
+    OUTPUT_FORMAT="json"
+    shift
+    ;;
+esac
 
 if [ $# -gt 0 ]; then
   QUESTION="$*"
@@ -63,6 +87,7 @@ LOG_FILE="${LOG_DIR}/README.md"
 REPO_ROOT="$(chat_worktree_repo_root)"
 WORKTREE_PATH="$(chat_worktree_path_for_branch "$REPO_ROOT" "$BRANCH")"
 BASE_BRANCH="main"
+CHAT_LIFECYCLE_WORKFLOW=".agentic/00.chat/workflows/chat-start.md"
 
 if ! git show-ref --verify --quiet "refs/heads/${BASE_BRANCH}"; then
   BASE_BRANCH="$(git branch --show-current)"
@@ -73,22 +98,15 @@ if [ -z "${BASE_BRANCH// }" ]; then
   exit 1
 fi
 
-CLASSIFICATION="$(bash scripts/00.chat/classification/classify-task/script.sh "$QUESTION" || true)"
-LAYER="$(printf '%s\n' "$CLASSIFICATION" | sed -n 's/^Layer: //p')"
-MODE="$(printf '%s\n' "$CLASSIFICATION" | sed -n 's/^Mode: //p')"
-WORKFLOW="$(printf '%s\n' "$CLASSIFICATION" | sed -n 's/^Workflow: //p')"
-
-LAYER="${LAYER:-unknown}"
-MODE="${MODE:-unknown}"
-WORKFLOW="${WORKFLOW:-unknown}"
-
 if [ -n "$(git status --porcelain)" ]; then
   WORKTREE_STATUS="dirty"
 else
   WORKTREE_STATUS="clean"
 fi
 
-git status --short
+if [ "$OUTPUT_FORMAT" = "text" ]; then
+  git status --short
+fi
 
 git branch "$BRANCH" "$BASE_BRANCH"
 mkdir -p "${WORKTREE_PATH%/*}"
@@ -104,12 +122,16 @@ id: ${STAMP}-${SLUG}
 task: ${QUESTION}
 branch: ${BRANCH}
 worktree: ${WORKTREE_PATH}
-layer: ${LAYER}
-mode: ${MODE}
-workflow: ${WORKFLOW}
+chat_lifecycle_workflow: ${CHAT_LIFECYCLE_WORKFLOW}
 status: ready
 raised_at_utc: ${RAISED_AT_UTC}
-codex_session_log_path:
+transcript_provider:
+transcript_path:
+transcript_bytes:
+transcript_source:
+latest_context_packet_id:
+latest_context_packet_routing_summary:
+latest_context_packet_at_utc:
 latest_commit_at_utc:
 latest_commit_sha:
 chat_duration:
@@ -176,26 +198,68 @@ Estimated chat cost basis:
 - None recorded yet.
 EOF
 
-echo "Created branch: $BRANCH"
-echo "Created log: $LOG_FILE"
-echo "Created worktree: $WORKTREE_PATH"
+if [ "$OUTPUT_FORMAT" = "text" ]; then
+  echo "Created branch: $BRANCH"
+  echo "Created log: $LOG_FILE"
+  echo "Created worktree: $WORKTREE_PATH"
+fi
+
+if [ "$OUTPUT_FORMAT" = "text" ]; then
+  CHAT_OPEN_WORKTREE_WINDOW="${CHAT_OPEN_WORKTREE_WINDOW:-skip}" \
+    bash scripts/00.chat/worktree/open-window/script.sh "$WORKTREE_PATH"
+fi
 
 FIRST_PROMPT="Task: ${QUESTION}
 Session log: ${LOG_FILE}
 Chat worktree: ${WORKTREE_PATH}
-Layer: ${LAYER}
-Mode: ${MODE}
-Workflow: ${WORKFLOW}
+Chat lifecycle workflow: ${CHAT_LIFECYCLE_WORKFLOW}
+Latest context packet id:
+Latest context packet routing summary:
 Bootstrap worktree status: ${WORKTREE_STATUS}
 
 If Bootstrap worktree status is dirty, reply exactly:
-Blocked: dirty worktree. Confirm proceed? Layer: ${LAYER}. Mode: ${MODE}. Workflow: ${WORKFLOW}
+Blocked: dirty worktree. Confirm proceed?
 
 Before that response, do not read workflows or run git status/dirty checks.
 
-Default mode: read-only until I grant write permission in this chat.
-For writes or commit-boundary work, use the chat worktree above and follow the current workflow gates.
+Governed startup bootstrap has already created this chat branch, worktree, and session log.
+Default mode after startup bootstrap: read-only until I grant write permission in this chat.
+For task writes or commit-boundary work, use the chat worktree above and follow the current workflow gates.
+For prompt-level routing, use the current user request, this repo's assistant instructions, and any repo-provided context router if one exists. Do not assign the whole chat a durable layer, mode, or workflow.
 Do not commit without my explicit approval."
+
+emit_json_packet() {
+  node - \
+    "$QUESTION" \
+    "$LOG_FILE" \
+    "$WORKTREE_PATH" \
+    "$CHAT_LIFECYCLE_WORKFLOW" \
+    "$WORKTREE_STATUS" \
+    "$FIRST_PROMPT" <<'NODE'
+const [
+  task,
+  sessionLog,
+  chatWorktree,
+  chatLifecycleWorkflow,
+  bootstrapWorktreeStatus,
+  firstPrompt
+] = process.argv.slice(2);
+
+const packet = {
+  schema: 'llm-workbench/startup-packet/v1',
+  task,
+  session_log: sessionLog,
+  chat_worktree: chatWorktree,
+  chat_lifecycle_workflow: chatLifecycleWorkflow,
+  latest_context_packet_id: '',
+  latest_context_packet_routing_summary: '',
+  bootstrap_worktree_status: bootstrapWorktreeStatus,
+  first_prompt: firstPrompt
+};
+
+process.stdout.write(`${JSON.stringify(packet, null, 2)}\n`);
+NODE
+}
 
 print_first_prompt() {
   echo
@@ -226,10 +290,18 @@ copy_first_prompt_with_retry() {
   return 1
 }
 
+if [ "$OUTPUT_FORMAT" = "json" ]; then
+  git -C "$WORKTREE_PATH" add "$LOG_FILE"
+  emit_json_packet
+  exit 0
+fi
+
 if [ "${CHAT_COPY_PROMPT:-copy}" = "skip" ]; then
   print_first_prompt
 elif command -v clip.exe >/dev/null 2>&1; then
   copy_first_prompt_with_retry "clip.exe" clip.exe || print_first_prompt
+elif command -v pbcopy >/dev/null 2>&1; then
+  copy_first_prompt_with_retry "pbcopy" pbcopy || print_first_prompt
 elif command -v xclip >/dev/null 2>&1; then
   copy_first_prompt_with_retry "xclip" xclip -selection clipboard || print_first_prompt
 else

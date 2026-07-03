@@ -1,14 +1,24 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: workflow
-purpose: Govern explicit local merge from completed chat branches into main.
-domain: local-merge
-portability: llm-workbench-required
-used_by:
-  - .agentic/00.chat/workflows/README.md
-  - scripts/00.chat/local-merge/verify-chat-ready-to-merge-local-main/script.sh
+  schema: agentic-artifact/v2
+  id: chat.workflows.chat-promote-to-main
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: local-merge
+  disciplines:
+  - agentic
+  kind: workflow
+  purpose: Govern explicit local merge from completed chat branches into main.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: chat.workflows.readme
+    path: .agentic/00.chat/workflows/README.md
+  - id: chat.script.local-merge.verify-chat-ready-to-merge-local-main
+    path: scripts/00.chat/local-merge/verify-chat-ready-to-merge-local-main/script.sh
 -->
-
 # Chat Promote To Main Workflow
 
 ## Use When
@@ -67,6 +77,10 @@ Do not change branches or edit files while blocked.
   user explicitly asks to inspect before refresh.
 - Prefer merging `main` into a chat branch because it preserves recorded commit
   SHAs and session evidence.
+- When promotion verification reports `blocked-behind` or `blocked-diverged`,
+  use the rehearsed preflight refresh flow in
+  `.agentic/00.chat/workflows/chat-refresh-from-main.md` before mutating the
+  active chat branch.
 - Rebase rewrites chat branch commits and requires explicit user approval.
 - Never refresh by discarding dirty work.
 - If conflicts appear, stop after Git reports the conflict set. Summarize the
@@ -78,26 +92,31 @@ If verification reports `blocked-behind`, do not merge the chat branch into
 `main`. If the user already requested merge or promotion to `main`, refresh the
 chat branch from `main` without asking for a second approval.
 
-For the approved non-rewriting refresh, run from the chat-owned worktree:
+For the approved non-rewriting refresh, use the rehearsed preflight refresh flow
+from `.agentic/00.chat/workflows/chat-refresh-from-main.md`:
 
 ```bash
-git merge --no-ff main
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/main-refresh/rehearse-refresh-from-main/script.sh
 ```
 
-Then rerun the relevant checks and rerun local merge verification.
+If the preflight succeeds, run the required checks, apply the rehearsed refresh
+with `scripts/00.chat/main-refresh/apply-rehearsed-refresh/script.sh`, then
+rerun local merge verification.
 
 ### Diverged From `main`
 
 If verification reports `blocked-diverged`, do not merge the chat branch into
 `main`. Explain that both `main` and the chat branch have unique commits.
 
-If the user already requested merge or promotion to `main`, merge `main` into
-the chat branch from the chat-owned worktree without asking for a second
-approval. Rebase rewrites chat branch commits and requires separate explicit
-approval.
+If the user already requested merge or promotion to `main`, run the rehearsed
+preflight refresh flow from `.agentic/00.chat/workflows/chat-refresh-from-main.md`
+without asking for a second approval. Rebase rewrites chat branch commits and
+requires separate explicit approval.
 
-If conflicts appear, stop after Git reports the conflict set. Summarize the
-conflicting files and ask before resolving them.
+If preflight conflicts appear, stop before resolving. Classify and record them
+using `.agentic/00.chat/standards/main-refresh-conflict-types.md`, then follow
+the preflight conflict audit and apply gates before mutating the active chat
+branch.
 
 ### Dirty Chat Worktree
 
@@ -116,8 +135,7 @@ unrecorded commit, or log-head mismatch, do not merge. Follow the verifier's
 required action and rerun verification.
 
 If the required recovery path is not covered by this workflow, a script, a gate,
-or a standard, use the missing-governance stop response from
-`.agentic/harness/standards/missing-governance-stop-condition.md`.
+or a standard, stop and report the missing governance gap before acting.
 
 ## Promotion Policy
 

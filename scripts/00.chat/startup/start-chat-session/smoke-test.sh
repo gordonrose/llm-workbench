@@ -1,17 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# agentic-script:
-#   owner: 00.chat
-#   purpose: Smoke test chat startup creates a separate chat-owned worktree.
+# agentic-artifact:
+#   schema: agentic-artifact/v2
+#   id: chat.script.startup.start-chat-session.smoke-test
+#   version: 1
+#   status: active
+#   layer: 00.chat
 #   domain: startup
-#   portability: llm-workbench-validation
+#   disciplines:
+#   - agentic
+#   kind: script
+#   purpose: Smoke test chat startup creates a separate chat-owned worktree.
+#   portability:
+#     class: reusable
+#     targets:
+#     - llm-workbench
 #   used_by:
-#     - .agentic/00.chat/workflows/chat-start.md
-#     - .agentic/00.chat/workflows/bootstrap-chat-workbench-repo.md
-#     - scripts/00.chat/startup/start-chat-session/README.md
-#   effects: writes-files, branches, worktrees, commits
-
+#   - id: chat.workflows.chat-start
+#     path: .agentic/00.chat/workflows/chat-start.md
+#   - id: chat.workflows.bootstrap-chat-workbench-repo
+#     path: .agentic/00.chat/workflows/bootstrap-chat-workbench-repo.md
+#   - id: chat.script.startup.start-chat-session.readme
+#     path: scripts/00.chat/startup/start-chat-session/README.md
+#   effects:
+#   - writes-files
+#   - branches
+#   - worktrees
+#   - commits
 fail() {
   echo "FAIL: $*" >&2
   exit 1
@@ -31,20 +47,20 @@ mkdir -p "$REPO"
 git -C "$REPO" init --quiet --initial-branch=main
 
 mkdir -p \
-  "$REPO/scripts/00.chat/classification/classify-task" \
   "$REPO/scripts/00.chat/git/cleanup-empty-chat-branches" \
   "$REPO/scripts/00.chat/session-log/paths" \
   "$REPO/scripts/00.chat/startup/start-chat-session" \
   "$REPO/scripts/00.chat/worktree/ensure-chat-worktree" \
+  "$REPO/scripts/00.chat/worktree/open-window" \
   "$REPO/scripts/00.chat/worktree/paths"
 
 cp "$SOURCE_ROOT/scripts/00.chat/session-log/paths/lib.sh" "$REPO/scripts/00.chat/session-log/paths/lib.sh"
 cp "$SOURCE_ROOT/scripts/00.chat/worktree/paths/lib.sh" "$REPO/scripts/00.chat/worktree/paths/lib.sh"
 cp "$SOURCE_ROOT/scripts/00.chat/worktree/ensure-chat-worktree/script.sh" "$REPO/scripts/00.chat/worktree/ensure-chat-worktree/script.sh"
-cp "$SOURCE_ROOT/scripts/00.chat/classification/classify-task/script.sh" "$REPO/scripts/00.chat/classification/classify-task/script.sh"
 cp "$SOURCE_ROOT/scripts/00.chat/startup/start-chat-session/script.sh" "$REPO/scripts/00.chat/startup/start-chat-session/script.sh"
 cp "$SOURCE_ROOT/scripts/00.chat/git/cleanup-empty-chat-branches/script.sh" "$REPO/scripts/00.chat/git/cleanup-empty-chat-branches/script.sh"
-chmod +x "$REPO/scripts/00.chat/classification/classify-task/script.sh" "$REPO/scripts/00.chat/startup/start-chat-session/script.sh" "$REPO/scripts/00.chat/worktree/ensure-chat-worktree/script.sh" "$REPO/scripts/00.chat/git/cleanup-empty-chat-branches/script.sh"
+cp "$SOURCE_ROOT/scripts/00.chat/worktree/open-window/script.sh" "$REPO/scripts/00.chat/worktree/open-window/script.sh"
+chmod +x "$REPO/scripts/00.chat/startup/start-chat-session/script.sh" "$REPO/scripts/00.chat/worktree/ensure-chat-worktree/script.sh" "$REPO/scripts/00.chat/worktree/open-window/script.sh" "$REPO/scripts/00.chat/git/cleanup-empty-chat-branches/script.sh"
 
 printf 'base\n' > "$REPO/README.md"
 git -C "$REPO" add README.md scripts
@@ -55,7 +71,11 @@ CHAT_CLEANUP_EMPTY_BRANCHES=skip \
 CHAT_COPY_PROMPT=skip \
   bash -c 'cd "$1" && shift && "$@"' sh "$REPO" \
     bash scripts/00.chat/startup/start-chat-session/script.sh "test chat worktree session" \
-    >/tmp/chat-worktree-session.out
+    >"$TMP_ROOT/chat-worktree-session.out"
+
+if ! grep -q 'Skipping VS Code window open:' "$TMP_ROOT/chat-worktree-session.out"; then
+  fail "startup did not skip VS Code window open by default"
+fi
 
 root_branch="$(git -C "$REPO" branch --show-current)"
 if [ "$root_branch" != "main" ]; then
@@ -93,14 +113,24 @@ if [ -z "$session_log" ]; then
 fi
 
 layer="$(sed -n '/<!-- agentic-session/,/-->/s/^layer: //p' "$worktree_path/$session_log" | head -n 1)"
+mode="$(sed -n '/<!-- agentic-session/,/-->/s/^mode: //p' "$worktree_path/$session_log" | head -n 1)"
 workflow="$(sed -n '/<!-- agentic-session/,/-->/s/^workflow: //p' "$worktree_path/$session_log" | head -n 1)"
+chat_lifecycle_workflow="$(sed -n '/<!-- agentic-session/,/-->/s/^chat_lifecycle_workflow: //p' "$worktree_path/$session_log" | head -n 1)"
 
-if [ "$layer" != "chat" ]; then
-  fail "chat startup did not classify the session as chat layer: ${layer:-missing}"
+if [ -n "$layer" ] || [ -n "$mode" ] || [ -n "$workflow" ]; then
+  fail "chat startup wrote durable classification fields"
 fi
 
-if [ "$workflow" != ".agentic/00.chat/workflows/chat-start.md" ]; then
-  fail "chat startup did not use the 00.chat workflow: ${workflow:-missing}"
+if [ "$chat_lifecycle_workflow" != ".agentic/00.chat/workflows/chat-start.md" ]; then
+  fail "chat startup did not record the chat lifecycle workflow: ${chat_lifecycle_workflow:-missing}"
+fi
+
+if ! sed -n '/<!-- agentic-session/,/-->/p' "$worktree_path/$session_log" | grep -q '^latest_context_packet_id:$'; then
+  fail "chat startup did not initialize latest_context_packet_id"
+fi
+
+if ! sed -n '/<!-- agentic-session/,/-->/p' "$worktree_path/$session_log" | grep -q '^latest_context_packet_routing_summary:$'; then
+  fail "chat startup did not initialize latest_context_packet_routing_summary"
 fi
 
 FAKE_BIN="$TMP_ROOT/fake-bin"
@@ -115,6 +145,7 @@ chmod +x "$FAKE_BIN/clip.exe"
 AGENTIC_CHAT_WORKTREE_ROOT="$TMP_ROOT/worktrees" \
 CHAT_CLEANUP_EMPTY_BRANCHES=skip \
 CHAT_COPY_PROMPT=copy \
+CHAT_OPEN_WORKTREE_WINDOW=skip \
 PATH="$FAKE_BIN:$PATH" \
   bash -c 'cd "$1" && shift && "$@"' sh "$REPO" \
     bash scripts/00.chat/startup/start-chat-session/script.sh "test clipboard fallback session" \
@@ -126,6 +157,26 @@ fi
 
 if ! grep -q 'Paste this into Codex / Claude / Mistral:' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
   fail "clipboard failure did not print the first prompt"
+fi
+
+if ! grep -q 'Governed startup bootstrap has already created this chat branch, worktree, and session log.' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
+  fail "first prompt did not explain startup bootstrap boundary"
+fi
+
+if ! grep -q 'Default mode after startup bootstrap: read-only until I grant write permission in this chat.' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
+  fail "first prompt did not preserve task write permission boundary"
+fi
+
+if ! grep -q "For prompt-level routing, use the current user request, this repo's assistant instructions, and any repo-provided context router if one exists." "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
+  fail "first prompt did not explain neutral prompt-level routing"
+fi
+
+if ! grep -q 'Do not assign the whole chat a durable layer, mode, or workflow.' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
+  fail "first prompt did not preserve durable classification guard"
+fi
+
+if grep -q 'query the RAG/rulebook runtime' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
+  fail "first prompt assumes a RAG/rulebook runtime exists"
 fi
 
 echo "chat worktree session smoke test passed."

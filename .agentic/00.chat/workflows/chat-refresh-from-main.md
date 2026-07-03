@@ -1,14 +1,24 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: workflow
-purpose: Govern refreshing a chat branch from local main without losing work or bypassing recovery paths.
-domain: main-refresh
-portability: llm-workbench-required
-used_by:
-  - .agentic/shared/workflows/change-shared-process.md
-  - docs/harness/architecture/adrs/0011-use-chat-owned-worktrees-for-local-convergence.md
+  schema: agentic-artifact/v2
+  id: chat.workflows.chat-refresh-from-main
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: main-refresh
+  disciplines:
+  - agentic
+  kind: workflow
+  purpose: Govern refreshing a chat branch from local main without losing work or bypassing
+    recovery paths.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: shared.workflows.change-shared-process
+    path: .agentic/shared/workflows/change-shared-process.md
+  - id: harness.architecture.adr.0011-use-chat-owned-worktrees-for-local-convergence
 -->
-
 # Chat Refresh From Main Workflow
 
 ## Use When
@@ -129,35 +139,40 @@ refresh should be rehearsed before mutating the active chat worktree.
    worktree:
 
    ```bash
-   bash scripts/00.chat/main-refresh/rehearse-refresh-from-main/script.sh
+   bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/main-refresh/rehearse-refresh-from-main/script.sh
    ```
 
 3. If preflight reports conflicts, stop before resolving. Classify each
    conflicted path with:
 
-   ```txt
-   .agentic/00.chat/standards/main-refresh-conflict-types.md
+   ```bash
+   bash scripts/00.chat/main-refresh/classify-conflict/script.sh <conflicted-path>
    ```
 
-   Resolve only conflicts with deterministic actions in that standard. If no
-   existing type fits, use the missing-governance stop response and propose a
-   new type or expansion before resolving.
+   Use `.agentic/00.chat/standards/main-refresh-conflict-types.md` as the
+   authority for the classification. Resolve only conflicts with deterministic
+   actions in that standard. If no existing type fits, use the
+   missing-governance stop response and propose a new type or expansion before
+   resolving.
 
    Record every conflict classification and resolution under `## Main Refresh
    Conflicts` in the current chat session log with:
 
    ```bash
-   bash scripts/00.chat/session-log/record-main-refresh-conflict/script.sh ...
+   bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-main-refresh-conflict/script.sh ...
    ```
 
    Do not apply the rehearsed refresh until the session log records the audit
    trail for every conflicted path.
 4. If the user already approved the main-refresh preflight, and the preflight
    branch is clean, fully resolved, tested, and contains the intended merge
-   result, apply it back to the chat branch automatically:
+   result, verify the session-log audit trail, then apply it back to the chat
+   branch automatically:
 
    ```bash
-   bash scripts/00.chat/main-refresh/apply-rehearsed-refresh/script.sh <preflight-branch>
+   bash scripts/00.chat/main-refresh/verify-conflict-audit/script.sh \
+     --path <conflicted-path> ...
+   bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/main-refresh/apply-rehearsed-refresh/script.sh <preflight-branch>
    ```
 
 5. Applying the rehearsed refresh fast-forwards the active chat branch, verifies it points at the

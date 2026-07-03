@@ -1,23 +1,33 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: migration-plan
-purpose: Track migration from legacy chat lifecycle paths to canonical 00.chat paths.
-domain: migration
-portability: llm-workbench-required
-used_by:
-  - scripts/00.chat/migration/audit-chat-layer-migration/script.sh
-  - docs/harness/architecture/adrs/0017-organize-scripts-by-owner-domain-and-capability.md
+  schema: agentic-artifact/v2
+  id: chat.migration-plan
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: migration
+  disciplines:
+  - agentic
+  kind: migration-plan
+  purpose: Track migration from legacy chat lifecycle paths to canonical 00.chat paths.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: chat.script.migration.audit-chat-layer-migration
+    path: scripts/00.chat/migration/audit-chat-layer-migration/script.sh
+  - id: harness.architecture.adr.0017-organize-scripts-by-owner-domain-and-capability
 -->
-
 # 00.chat Migration Plan
 
 ## Purpose
 
-Guide future chats as chat lifecycle governance moves from compatibility paths
-into `.agentic/00.chat/`.
+Guide future chats as chat lifecycle governance finishes moving from
+compatibility paths into `.agentic/00.chat/`.
 
 The goal is controlled migration, not a big-bang rename. Legacy paths may stay
-in place as compatibility shims while active sessions still reference them.
+in historical references, but operative chat lifecycle governance belongs in
+`.agentic/00.chat/`.
 
 ## Current Canonical Surfaces
 
@@ -38,15 +48,17 @@ in place as compatibility shims while active sessions still reference them.
 - Cleanup: `.agentic/00.chat/workflows/chat-cleanup.md`
 - Reporting: `.agentic/00.chat/workflows/chat-reporting.md`
 
-## Compatibility Paths
+## Retired Compatibility Paths
 
-These paths may remain for existing references, but they must point to or defer
-to the canonical chat layer:
+These old shared paths are retired. Historical references may mention them, but
+operative instructions, audits, and package scripts should point to the
+canonical chat layer:
 
 - `.agentic/shared/workflows/chat-start-interview.md`
 - `.agentic/shared/workflows/main-updated.md`
 - `.agentic/shared/workflows/local-convergence.md`
 - `.agentic/shared/checklists/before-commit.md`
+- `.agentic/shared/workflows/default.md`
 
 Script compatibility wrappers under `scripts/shared/chat/` and
 `scripts/shared/git/` have been retired. Keep historical references for audit
@@ -56,8 +68,8 @@ canonical `scripts/00.chat/...` capability paths.
 ## Migration Rules
 
 - Move ownership prose before moving executable paths.
-- Keep old workflow/checklist paths as compatibility pointers until no active
-  session metadata or scripts rely on them.
+- Keep retired workflow/checklist paths absent unless an active session recovery
+  explicitly requires a governed restore.
 - Preserve exact blocked responses when changing workflow ownership.
 - Keep scripts deterministic; do not replace scriptable gates with prose.
 - Maintain focused smoke tests for startup, classification, refresh, commit,
@@ -77,19 +89,29 @@ canonical `scripts/00.chat/...` capability paths.
 4. Added audit coverage for the chat-layer package script surface.
 5. Kept focused smoke tests for startup, classification, refresh, commit,
    reporting, cleanup, commands, and package scripts.
+6. Audited active session metadata and retired redundant shared chat lifecycle
+   pointers, duplicate before-commit compatibility checklist, and placeholder
+   default workflows.
+7. Added governed cleanup for temporary preflight branches and worktrees when a
+   rehearsed main refresh is applied. The apply helper removes the promoted
+   preflight branch/worktree, removes clean stale sibling preflights that are
+   already ancestors of the promoted chat branch, and reports unsafe stale
+   preflights without deleting them.
+8. Narrowed `.agentic/shared/workflows/change-shared-process.md` so it keeps
+   shared-process ownership and chat harness entry gates, while delegating
+   chat lifecycle commit recording, transcript metrics, bookkeeping checkpoint,
+   and commit-log deletion rules to `.agentic/00.chat/checklists/before-commit.md`.
+9. Added a deterministic main-refresh conflict classifier based on the conflict
+   type standard and the first recorded main-refresh recovery evidence.
+10. Added a preflight conflict audit verification gate that compares conflict
+    paths with `## Main Refresh Conflicts` entries before applying a resolved
+    preflight refresh.
 
 ## Deferred Migration Queue
 
-1. Audit session metadata to determine when legacy workflow paths can be
-   retired.
-2. Add governed cleanup for temporary preflight branches and worktrees once the
-   desired retention policy is explicit.
-3. Review whether `change-shared-process.md` should keep chat lifecycle notes
-   or narrow itself to cross-layer process only.
-4. Add a conflict classifier script after the conflict type standard has been
-   exercised by at least one main-refresh recovery.
-5. Add a verification gate that compares unresolved or resolved preflight
-   conflict paths with `## Main Refresh Conflicts` entries before promotion.
+No deferred migration items remain. Future conflict types or verification
+expansions should be added only when new main-refresh recovery evidence exposes
+a gap in the current standard or scripts.
 
 Do not treat deferred items as permission to improvise. Complete them only when
 their stated evidence, policy, or workflow precondition exists.
@@ -102,8 +124,8 @@ Run:
 bash scripts/00.chat/migration/audit-chat-layer-migration/script.sh
 ```
 
-The audit reports required canonical files, remaining workflow/checklist
-compatibility paths, and remaining legacy shared workflow references in
+The audit reports required canonical files, retired compatibility paths that
+should stay absent, and remaining retired compatibility references in
 source/process files. It also inventories policy references to the retired
 aggregate summary so future chats can tell intentional "do not recreate this"
 guidance apart from generated-artifact regression. It does not treat historical

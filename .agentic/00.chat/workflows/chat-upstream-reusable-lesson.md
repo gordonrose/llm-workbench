@@ -1,3 +1,24 @@
+<!-- agentic-artifact:
+  schema: agentic-artifact/v2
+  id: chat.workflows.chat-upstream-reusable-lesson
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: chat
+  disciplines:
+  - agentic
+  kind: workflow
+  purpose: Document Chat Upstream Reusable Lesson Workflow.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+    - entity-builder
+    - design-system-builder
+  used_by:
+  - id: repo.agents
+    path: AGENTS.md
+-->
 # Chat Upstream Reusable Lesson Workflow
 
 ## Use When
@@ -15,6 +36,10 @@ The workflow documents and opens the upstream task. It does not silently copy
 files, edit the source repo, push to remotes, or mutate both repos in one step.
 
 Architecture decision: `docs/harness/architecture/adrs/0014-promote-reusable-lessons-upstream.md`.
+
+When the reusable lesson affects public `llm-workbench` startup, install,
+assistant adapters, metrics, portability, or export behavior, it must preserve
+`.agentic/00.chat/standards/llm-workbench-public-beta-contract.md`.
 
 ## Ownership Model
 
@@ -34,7 +59,7 @@ Before opening the upstream chat, collect:
 - source branch
 - source chat worktree absolute path
 - source session log absolute or repo-relative path
-- source Codex transcript path when recorded in session metadata
+- source transcript provider and path when recorded in session metadata
 - target upstream repo absolute path
 - reusable lesson summary
 - source evidence paths or commands

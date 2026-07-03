@@ -1,15 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# agentic-script:
-#   owner: 00.chat
-#   purpose: Rehearse refreshing a chat branch from main in a temporary worktree.
+# agentic-artifact:
+#   schema: agentic-artifact/v2
+#   id: chat.script.main-refresh.rehearse-refresh-from-main
+#   version: 1
+#   status: active
+#   layer: 00.chat
 #   domain: main-refresh
-#   portability: llm-workbench-required
+#   disciplines:
+#   - agentic
+#   kind: script
+#   purpose: Rehearse refreshing a chat branch from main in a temporary worktree.
+#   portability:
+#     class: required
+#     targets:
+#     - llm-workbench
 #   used_by:
-#     - .agentic/00.chat/workflows/chat-refresh-from-main.md
-#     - scripts/00.chat/main-refresh/rehearse-refresh-from-main/smoke-test.sh
-#   effects: branches, worktrees, commits
+#   - id: chat.workflows.chat-refresh-from-main
+#     path: .agentic/00.chat/workflows/chat-refresh-from-main.md
+#   - id: chat.script.main-refresh.rehearse-refresh-from-main.smoke-test
+#     path: scripts/00.chat/main-refresh/rehearse-refresh-from-main/smoke-test.sh
+#   effects:
+#   - branches
+#   - commits
+#   - worktrees
 
 usage() {
   cat <<'EOF'
@@ -63,7 +78,12 @@ case "$CURRENT_BRANCH" in
 esac
 
 CURRENT_HEAD="$(git rev-parse HEAD)"
-SAFE_BRANCH="$(printf '%s' "$CURRENT_BRANCH" | tr -c 'A-Za-z0-9._-' '-')"
+RAW_SAFE_BRANCH="$(printf '%s' "$CURRENT_BRANCH" | tr -c 'A-Za-z0-9._-' '-')"
+SAFE_BRANCH_PREFIX="$(printf '%s' "$RAW_SAFE_BRANCH" | cut -c1-48 | sed -E 's/[-.]+$//')"
+if [ -z "${SAFE_BRANCH_PREFIX// }" ]; then
+  SAFE_BRANCH_PREFIX="chat"
+fi
+SAFE_BRANCH="${SAFE_BRANCH_PREFIX}-$(git rev-parse --short=12 HEAD)"
 STAMP="$(date -u +%Y%m%d%H%M%S)"
 PREFLIGHT_BRANCH="agentic/preflight/${SAFE_BRANCH}/${STAMP}"
 PREFLIGHT_ROOT="${TMPDIR:-/tmp}/agentic-main-refresh-preflight"

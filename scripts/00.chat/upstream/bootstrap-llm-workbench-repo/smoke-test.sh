@@ -1,15 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# agentic-script:
-#   owner: 00.chat
-#   purpose: Smoke test the llm-workbench bootstrap dry-run planner.
+# agentic-artifact:
+#   schema: agentic-artifact/v2
+#   id: chat.script.upstream.bootstrap-llm-workbench-repo.smoke-test
+#   version: 1
+#   status: active
+#   layer: 00.chat
 #   domain: validation
-#   portability: llm-workbench-validation
+#   disciplines:
+#   - agentic
+#   kind: script
+#   purpose: Smoke test the llm-workbench bootstrap dry-run planner.
+#   portability:
+#     class: reusable
+#     targets:
+#     - llm-workbench
 #   used_by:
-#     - scripts/00.chat/upstream/bootstrap-llm-workbench-repo/README.md
-#     - scripts/00.chat/bootstrap/audit-chat-bootstrap-file-set/script.sh
-#   effects: writes-files
+#   - id: chat.script.upstream.bootstrap-llm-workbench-repo.readme
+#     path: scripts/00.chat/upstream/bootstrap-llm-workbench-repo/README.md
+#   - id: chat.script.bootstrap.audit-chat-bootstrap-file-set
+#     path: scripts/00.chat/bootstrap/audit-chat-bootstrap-file-set/script.sh
+#   effects:
+#   - writes-files
 
 fail() {
   echo "FAIL: $*" >&2
@@ -48,22 +61,31 @@ make_repo "$EMPTY_REPO"
 run_plan "$EMPTY_REPO" "$TMP_ROOT/empty.out"
 grep -q '^CREATE package.json$' "$TMP_ROOT/empty.out" || fail "empty repo did not plan package creation"
 grep -q '^CREATE scripts/00.chat/upstream/bootstrap-llm-workbench-repo/script.sh$' "$TMP_ROOT/empty.out" || fail "empty repo did not plan upstream planner script"
-grep -q '^CREATE docs/harness/architecture/public-chat-workbench-adrs.md$' "$TMP_ROOT/empty.out" || fail "empty repo did not plan public ADR manifest"
-grep -q '^CREATE docs/harness/architecture/adrs/0013-create-chat-layer-and-on-demand-session-summary.md$' "$TMP_ROOT/empty.out" || fail "empty repo did not plan selected chat ADR"
-if grep -q '^CREATE docs/harness/architecture/adrs/0001-record-harness-session-decisions-before-commit.md$' "$TMP_ROOT/empty.out"; then
-  fail "empty repo planned historical non-public ADR"
+if grep -q '^CREATE \.agentic/01\.harness/' "$TMP_ROOT/empty.out"; then
+  fail "empty repo planned source-maintenance .agentic/01.harness files"
 fi
-if grep -q '^CREATE docs/harness/architecture/adrs/0016-add-aws-layer.md$' "$TMP_ROOT/empty.out"; then
-  fail "empty repo planned non-chat AWS ADR"
+if grep -Eq '^CREATE docs/00\.chat/public-chat-workbench-adrs\.md$|^CREATE docs/harness/architecture/adrs/' "$TMP_ROOT/empty.out"; then
+  fail "empty repo planned public ADR export files"
 fi
 grep -q '^conflicts: 0$' "$TMP_ROOT/empty.out" || fail "empty repo reported conflicts"
 run_apply "$EMPTY_REPO" "$TMP_ROOT/empty-apply.out"
 test -f "$EMPTY_REPO/AGENTS.md" || fail "apply did not create AGENTS.md"
 test -f "$EMPTY_REPO/package.json" || fail "apply did not create package.json"
 test -f "$EMPTY_REPO/scripts/00.chat/upstream/bootstrap-llm-workbench-repo/script.sh" || fail "apply did not create planner script"
-test -f "$EMPTY_REPO/docs/harness/architecture/adrs/0013-create-chat-layer-and-on-demand-session-summary.md" || fail "apply did not create selected chat ADR"
-test ! -e "$EMPTY_REPO/docs/harness/architecture/adrs/0001-record-harness-session-decisions-before-commit.md" || fail "apply created historical non-public ADR"
-test ! -e "$EMPTY_REPO/docs/harness/architecture/adrs/0016-add-aws-layer.md" || fail "apply created non-chat AWS ADR"
+test ! -e "$EMPTY_REPO/.agentic/01.harness" || fail "apply created source-maintenance .agentic/01.harness"
+test ! -e "$EMPTY_REPO/docs/00.chat/public-chat-workbench-adrs.md" || fail "apply created public ADR manifest"
+test ! -e "$EMPTY_REPO/docs/harness/architecture/adrs" || fail "apply created ADR docs"
+for source_only_path in \
+  scripts/01.harness/artifact-metadata/backfill-v2-headers/script.sh \
+  scripts/01.harness/artifact-metadata/generate-index/script.sh \
+  scripts/01.harness/check-artifact-metadata-headers.sh \
+  scripts/01.harness/check-artifact-path-migration.sh \
+  scripts/01.harness/check-rule-test-taxonomy.sh \
+  scripts/01.harness/plan-artifact-path-migration.sh \
+  scripts/01.harness/smoke-test-artifact-path-migration.sh; do
+  test ! -e "$EMPTY_REPO/$source_only_path" ||
+    fail "apply created source-maintenance harness script: $source_only_path"
+done
 node -e "const p=require(process.argv[1]); if (p.name !== 'llm-workbench') process.exit(1); if (!p.scripts.chat) process.exit(1)" "$EMPTY_REPO/package.json" || fail "created package.json did not match template"
 
 PACKAGE_REPO="$TMP_ROOT/package"
@@ -95,7 +117,9 @@ grep -q '^PRESERVE scripts/shared/custom/tool.sh$' "$TMP_ROOT/preserve.out" || f
 grep -q '^conflicts: 0$' "$TMP_ROOT/preserve.out" || fail "preserve repo reported conflicts"
 run_apply "$PRESERVE_REPO" "$TMP_ROOT/preserve-apply.out"
 test -f "$PRESERVE_REPO/scripts/shared/custom/tool.sh" || fail "apply removed target-owned shared script"
-test -f "$PRESERVE_REPO/scripts/shared/harness/run-governed-script.sh" || fail "apply did not create shared harness script"
+test -f "$PRESERVE_REPO/scripts/01.harness/run-governed-script.sh" || fail "apply did not create shared harness script"
+test -f "$PRESERVE_REPO/scripts/01.harness/check-deterministic-process-drift.sh" || fail "apply did not create deterministic drift check"
+test ! -e "$PRESERVE_REPO/scripts/01.harness/plan-artifact-path-migration.sh" || fail "apply created source-maintenance harness script"
 
 CONFLICT_REPO="$TMP_ROOT/conflict"
 make_repo "$CONFLICT_REPO"

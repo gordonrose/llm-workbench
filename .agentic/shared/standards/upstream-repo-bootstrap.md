@@ -1,3 +1,25 @@
+<!-- agentic-artifact:
+schema: agentic-artifact/v2
+id: shared.standards.upstream-repo-bootstrap
+version: 1
+status: active
+layer: 06.shared
+domain: bootstrap
+disciplines:
+- agentic
+kind: standard
+purpose: Define the Upstream Repo Bootstrap Standard standard.
+portability:
+  class: required
+  targets:
+  - llm-workbench
+  - entity-builder
+  - design-system-builder
+used_by:
+- id: repo.agents
+  path: AGENTS.md
+-->
+
 # Upstream Repo Bootstrap Standard
 
 ## Purpose
@@ -8,6 +30,9 @@ contains working harness, product, infrastructure, or process artifacts.
 The standard applies across layers. Layer workflows define the specific
 portable file set for chat, frontend, CRUD factory, AWS CI/CD, or other
 upstream repo types.
+
+For public `llm-workbench` bootstrap or sync work, also apply
+`.agentic/00.chat/standards/llm-workbench-public-beta-contract.md`.
 
 ## Ownership
 

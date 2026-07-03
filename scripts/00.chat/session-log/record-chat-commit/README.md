@@ -1,15 +1,25 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: capability-readme
-purpose: Explain how task commits are recorded into chat session logs and metrics.
-domain: session-log
-portability: llm-workbench-required
-used_by:
-  - scripts/00.chat/session-log/record-chat-commit/script.sh
-  - scripts/00.chat/session-log/record-chat-commit/smoke-test.sh
-  - docs/harness/architecture/adrs/0017-organize-scripts-by-owner-domain-and-capability.md
+  schema: agentic-artifact/v2
+  id: chat.script.session-log.record-chat-commit.readme
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: session-log
+  disciplines:
+  - agentic
+  kind: capability-readme
+  purpose: Explain how task commits are recorded into chat session logs and metrics.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: chat.script.session-log.record-chat-commit
+    path: scripts/00.chat/session-log/record-chat-commit/script.sh
+  - id: chat.script.session-log.record-chat-commit.smoke-test
+    path: scripts/00.chat/session-log/record-chat-commit/smoke-test.sh
+  - id: harness.architecture.adr.0017-organize-scripts-by-owner-domain-and-capability
 -->
-
 # Record Chat Commit
 
 `script.sh` records a completed task commit in the current chat session log.
@@ -59,12 +69,13 @@ The script records chat metrics at the commit boundary.
 Preferred transcript sources:
 
 1. `CHAT_TRANSCRIPT_BYTES`, when a caller supplies a byte count directly.
-2. `codex_session_log_path` metadata in the session log.
-3. Discovery of the matching Codex JSONL session log.
+2. Neutral session metadata such as `transcript_path` and `transcript_provider`.
+3. An explicit assistant adapter, for example `CHAT_TRANSCRIPT_PROVIDER=codex`
+   for Codex JSONL discovery.
 
-If transcript metrics cannot be found, the script stops. The explicit
-`ALLOW_MISSING_CHAT_TRANSCRIPT_METRICS=yes` escape hatch exists for legacy or
-recovery cases and records the metric as unavailable.
+If transcript metrics cannot be found, portable mode records the metric as
+unavailable. Set `CHAT_TRANSCRIPT_METRICS_MODE=strict` when a workflow requires
+exact transcript metrics before recording the commit.
 
 When a numeric token estimate is available, the script calls
 `scripts/00.chat/metrics/estimate-chat-cost/script.js` to record a cost estimate
@@ -98,7 +109,8 @@ chat-specific names when encountered.
 
 - missing transcript metrics fail clearly
 - the legacy missing-metrics escape hatch records unavailable metrics
-- Codex JSONL discovery records transcript path, token estimate, cost, and basis
+- assistant transcript discovery records provider, path, token estimate, cost,
+  and basis
 - supplied transcript byte counts override discovery
 - session-log file size is not used as a token source
 

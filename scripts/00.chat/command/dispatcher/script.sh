@@ -1,18 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# agentic-script:
-#   owner: 00.chat
-#   purpose: Dispatch chat subcommands from canonical scripts/00.chat/command folders.
+# agentic-artifact:
+#   schema: agentic-artifact/v2
+#   id: chat.script.command.dispatcher
+#   version: 1
+#   status: active
+#   layer: 00.chat
 #   domain: command
-#   portability: llm-workbench-required
+#   disciplines:
+#   - agentic
+#   kind: script
+#   purpose: Dispatch chat subcommands from canonical scripts/00.chat/command folders.
+#   portability:
+#     class: required
+#     targets:
+#     - llm-workbench
 #   used_by:
-#     - .agentic/00.chat/commands/README.md
-#     - scripts/00.chat/command/dispatcher/README.md
-#     - package.json scripts.chat
-#     - package.json scripts.chat:list
-#     - scripts/00.chat/startup/auto-start-missing-session/script.sh
-#   effects: branches, worktrees, writes-files, stages-files
+#   - id: chat.commands.readme
+#     path: .agentic/00.chat/commands/README.md
+#   - id: chat.script.command.dispatcher.readme
+#     path: scripts/00.chat/command/dispatcher/README.md
+#   - id: chat.script.startup.auto-start-missing-session
+#     path: scripts/00.chat/startup/auto-start-missing-session/script.sh
+#   effects:
+#   - branches
+#   - stages-files
+#   - worktrees
+#   - writes-files
 
 COMMAND_DIR="scripts/00.chat/command"
 
@@ -24,7 +39,7 @@ Commands:
 EOF
 
   if [ -d "$COMMAND_DIR" ]; then
-    find "$COMMAND_DIR" -mindepth 2 -maxdepth 2 -type f -path '*/script.sh' -perm -u+x \
+    find "$COMMAND_DIR" -mindepth 2 -maxdepth 2 -type f -path '*/script.sh' \
       ! -path "$COMMAND_DIR/dispatcher/script.sh" \
       | sed -E 's#^scripts/00\.chat/command/([^/]+)/script\.sh$#  \1#' \
       | sort
@@ -45,6 +60,11 @@ esac
 
 COMMAND_NAME="$1"
 shift
+
+if [ "$COMMAND_NAME" = "open" ] && [ "${1:-}" = "window" ]; then
+  COMMAND_NAME="open-window"
+  shift
+fi
 
 case "$COMMAND_NAME" in
   *[!a-zA-Z0-9_-]*|'')
@@ -68,9 +88,4 @@ if [ ! -f "$COMMAND_SCRIPT" ]; then
   exit 2
 fi
 
-if [ ! -x "$COMMAND_SCRIPT" ]; then
-  echo "ERROR: chat command is not executable: $COMMAND_SCRIPT" >&2
-  exit 2
-fi
-
-exec "$COMMAND_SCRIPT" "$@"
+exec bash "$COMMAND_SCRIPT" "$@"

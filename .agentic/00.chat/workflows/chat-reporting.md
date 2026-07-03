@@ -1,3 +1,24 @@
+<!-- agentic-artifact:
+  schema: agentic-artifact/v2
+  id: chat.workflows.chat-reporting
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: chat
+  disciplines:
+  - agentic
+  kind: workflow
+  purpose: Document Chat Reporting Workflow.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+    - entity-builder
+    - design-system-builder
+  used_by:
+  - id: repo.agents
+    path: AGENTS.md
+-->
 # Chat Reporting Workflow
 
 ## Use When
@@ -27,13 +48,13 @@ Use the chat-layer reporting skill for human-oriented summary work:
 Use the script for deterministic aggregate metrics:
 
 ```bash
-bash scripts/00.chat/reporting/generate-commit-log-summary/script.sh
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/reporting/generate-commit-log-summary/script.sh
 ```
 
 To write a file, require an explicit output path:
 
 ```bash
-bash scripts/00.chat/reporting/generate-commit-log-summary/script.sh --output <path>
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/reporting/generate-commit-log-summary/script.sh --output <path>
 ```
 
 ## Rules

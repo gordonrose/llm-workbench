@@ -1,14 +1,24 @@
 <!-- agentic-artifact:
-owner: 00.chat
-kind: capability-readme
-purpose: Explain how the chat session startup engine creates branches, logs, prompts, and worktrees.
-domain: startup
-portability: llm-workbench-required
-used_by:
-  - scripts/00.chat/startup/start-chat-session/script.sh
-  - docs/harness/architecture/adrs/0017-organize-scripts-by-owner-domain-and-capability.md
+  schema: agentic-artifact/v2
+  id: chat.script.startup.start-chat-session.readme
+  version: 1
+  status: active
+  layer: 00.chat
+  domain: startup
+  disciplines:
+  - agentic
+  kind: capability-readme
+  purpose: Explain how the chat session startup engine creates branches, logs, prompts,
+    and worktrees.
+  portability:
+    class: required
+    targets:
+    - llm-workbench
+  used_by:
+  - id: chat.script.startup.start-chat-session
+    path: scripts/00.chat/startup/start-chat-session/script.sh
+  - id: harness.architecture.adr.0017-organize-scripts-by-owner-domain-and-capability
 -->
-
 # Start Chat Session
 
 `script.sh` is the chat startup engine. It turns a short task summary into the
@@ -17,7 +27,7 @@ chat-owned worktree, a session log, and a first prompt for the next agent.
 
 The important idea is that a chat is treated as a small, auditable unit of work.
 Startup does the bookkeeping before the agent begins editing so the work has a
-known owner, location, workflow, and history from the first turn.
+known branch, location, lifecycle workflow, and history from the first turn.
 
 ## Mental Model
 
@@ -30,14 +40,20 @@ are open at once, each one has a physical directory and branch that belong to
 that conversation.
 
 The session log is the chat's durable memory. It records the task, branch,
-worktree, routing metadata, commits, unresolved questions, decisions, conflicts,
-and metrics. The harness uses that file as the first source of truth when a chat
-resumes.
+worktree, lifecycle workflow, latest context-packet references, commits,
+unresolved questions, decisions, conflicts, and metrics. The harness uses that
+file as the first source of truth when a chat resumes.
 
 The first prompt is the handoff packet. It tells the next agent the exact branch,
-worktree, layer, mode, workflow, and dirty-state handling rule. That prevents a
-new agent from guessing where it should work or which workflow governs the
-conversation.
+worktree, chat lifecycle workflow, context-packet continuity fields, and
+dirty-state handling rule. It also makes
+the startup boundary explicit: branch, worktree, and session-log bootstrap has
+already happened, while task edits remain read-only until the user grants write
+permission. That prevents a new agent from guessing where it should work or
+which chat lifecycle workflow governs the conversation. Prompt-level layer,
+mode, workflow, and corpus routing uses the current request, repo assistant
+instructions, and any repo-provided context router if one exists, not durable
+chat startup metadata.
 
 ## Inputs
 
@@ -56,7 +72,8 @@ conversation.
 
 The startup script always builds a first prompt. That prompt is a portable
 session packet for terminal-based startup: it contains the task, session log,
-chat worktree, layer, mode, workflow, and dirty-worktree stop response.
+chat worktree, chat lifecycle workflow, latest context-packet continuity fields,
+and dirty-worktree stop response.
 
 `CHAT_COPY_PROMPT` only controls how that terminal packet is handed to a human:
 copy it to the clipboard, or print it in the terminal. It is a terminal
@@ -68,9 +85,9 @@ They should use the startup data directly:
 - task summary
 - session log path
 - chat worktree path
-- layer
-- mode
-- workflow
+- chat lifecycle workflow
+- latest context packet id
+- latest context packet routing summary
 - starting worktree status
 
 That keeps the durable startup model the same while allowing different surfaces
@@ -90,11 +107,13 @@ to present or pass the session packet in their own way.
    each chat a stable id and creates a branch name like
    `chat/2026-06-19-20-27-move-chat-session-startup-engine`.
 
-3. Classify the task.
+3. Record chat lifecycle metadata.
 
-   The classifier chooses the harness layer, mode, and workflow. This is why the
-   first prompt can tell the agent whether it is doing chat lifecycle work,
-   harness maintenance, education work, product work, or another governed path.
+   Startup records the chat lifecycle workflow and initializes latest
+   context-packet fields. It does not classify the whole chat into a task layer,
+   mode, or workflow. The consuming agent should use the current request, repo
+   assistant instructions, and any repo-provided context router for prompt-level
+   routing context.
 
 4. Capture the starting worktree state.
 
@@ -116,21 +135,28 @@ to present or pass the session packet in their own way.
    worktree. It starts with machine-readable session metadata and human-readable
    sections for activity, decisions, issues, commits, conflicts, and metrics.
 
-7. Print or copy the first prompt for terminal use.
+7. Offer a chat worktree window.
+
+   Startup does not open a VS Code window by default. Set
+   `CHAT_OPEN_WORKTREE_WINDOW=open` to opt into opening the new chat worktree.
+   The explicit `chat:open-window` command remains available after startup.
+
+8. Print or copy the first prompt for terminal use.
 
    The prompt is the bridge from startup automation into the next agent turn. It
-   names the task, session log, worktree, layer, mode, workflow, and the
-   dirty-worktree stop response. Terminal startup can copy or print it. IDE and
-   app integrations should treat those fields as structured startup data rather
-   than depending on clipboard behavior.
+  names the task, session log, worktree, chat lifecycle workflow, context-packet
+  continuity fields, startup bootstrap boundary, and the dirty-worktree stop
+  response. Terminal startup can copy or print it. IDE and app integrations
+  should treat those fields as structured startup data rather than depending on
+  clipboard behavior.
 
-8. Clean empty chat branches.
+9. Clean empty chat branches.
 
    Startup can run the empty-chat-branch cleanup script after creating the new
    session. This keeps abandoned zero-commit chat branches from accumulating
    while still routing cleanup through a governed script.
 
-9. Stage the session log in the chat worktree.
+10. Stage the session log in the chat worktree.
 
    The log is staged so the first real task commit can include the session
    record if appropriate. The root worktree is left alone.
@@ -139,9 +165,11 @@ to present or pass the session packet in their own way.
 
 - It does not push anything.
 - It does not merge the chat branch.
-- It does not grant write permission to the agent.
+- It does not grant task write permission to the agent.
 - It does not decide that dirty root work is safe to ignore.
-- It does not replace the workflow listed in the session metadata.
+- It does not classify the whole chat into one task layer, mode, or workflow.
+- It does not replace prompt-level routing from assistant instructions or a
+  repo-provided context router.
 
 ## Typical Result
 
@@ -151,14 +179,16 @@ After a successful run, expect:
 - a sibling chat worktree
 - a staged session log inside that worktree
 - a first prompt printed or copied for the next agent
+- no VS Code window unless `CHAT_OPEN_WORKTREE_WINDOW=open` is set
 - the original root worktree still on its original branch
 
 ## Smoke Test
 
 `smoke-test.sh` creates a throwaway Git repo and runs startup there. It verifies
 that startup leaves the root repo on `main`, creates a separate chat worktree,
-stages the session log in that chat worktree, records chat startup metadata, and
-falls back to printed terminal handoff when clipboard copy fails.
+stages the session log in that chat worktree, records chat lifecycle metadata,
+skips opening a VS Code window by default, and falls back to printed terminal
+handoff when clipboard copy fails.
 
 ## Compatibility
 

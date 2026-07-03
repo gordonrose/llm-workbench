@@ -1,15 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# agentic-script:
-#   owner: 00.chat
-#   purpose: Build and copy or print the governed chat closeout prompt.
+# agentic-artifact:
+#   schema: agentic-artifact/v2
+#   id: chat.script.closeout.build-closeout-prompt
+#   version: 1
+#   status: active
+#   layer: 00.chat
 #   domain: closeout
-#   portability: llm-workbench-required
+#   disciplines:
+#   - agentic
+#   kind: script
+#   purpose: Build and copy or print the governed chat closeout prompt.
+#   portability:
+#     class: required
+#     targets:
+#     - llm-workbench
 #   used_by:
-#     - .agentic/00.chat/commands/README.md
-#     - scripts/00.chat/command/dispatcher/script.sh
-#   effects: read-only
+#   - id: chat.commands.readme
+#     path: .agentic/00.chat/commands/README.md
+#   - id: chat.script.command.dispatcher
+#     path: scripts/00.chat/command/dispatcher/script.sh
+#   effects:
+#   - read-only
 
 # shellcheck source=../../session-log/paths/lib.sh
 source "scripts/00.chat/session-log/paths/lib.sh"
@@ -81,7 +94,7 @@ Use the current session log as the first source of truth.
 If there is uncommitted task work, follow .agentic/00.chat/workflows/chat-commit.md and .agentic/00.chat/checklists/before-commit.md.
 Ask for explicit approval before creating any task commit.
 After any task commit, record it with:
-bash scripts/shared/harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-chat-commit/script.sh <sha> <message> <summary> [adr-impact]
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-chat-commit/script.sh <sha> <message> <summary> [adr-impact]
 
 Then follow .agentic/00.chat/workflows/chat-promote-to-main.md for local convergence.
 Run the required gates and verification before merging.
