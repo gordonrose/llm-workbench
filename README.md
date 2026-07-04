@@ -1,66 +1,44 @@
 # llm-workbench
 
-`llm-workbench` lets you have multiple chats open in your code editors
-and work on them in parallel without contaminating your local main branch.
+Run AI coding sessions in isolated git worktrees without dirtying `main`.
 
-When you switch between LLM chat sessions - it creates a temporary worktree and branch for that session automatically. it also creates a commitLog for that session that tracks decisions, questions, amd commits automatically that goves you auditability and traceabity. 
+## Why use it?
 
-You can have multiple sessions open working with whichever LLM in vscode; it will keep a record of each one; let you iterate on each one and keep your local main clean until you’re ready to merge
+AI coding tools are useful, but they make it easy to lose context, mix unrelated changes, or pollute your main branch.
 
-it is standalone, LLM provider-neutral (works with CLAUDE/Codex/Mistral)
+`llm-workbench` gives every chat session its own branch, worktree, and session log so you can experiment safely and merge only when ready.
 
-it works with blank or existing repos, has a safe install/uninstall, assistant adapters, JSON
-startup packets, and portable transcript metadata across common CLI and
-code-assistant workflows.
-
-It gives a Git repo a repeatable way to start work in chat-owned branches and
-worktrees, record session logs, run commit gates, refresh from local `main`, and
-promote reusable lessons back upstream.
-
-## What You Get
-
-- chat startup and session logs under `commitLogs/`
-- chat-owned worktrees for implementation work
-- public `npm run chat:*` commands
-- governed script execution for repeatable helper commands
-- local merge readiness and main-refresh checks
-- onboarding docs for every chat script folder
-
-## Quick Start
+## Quick start
 
 ```bash
-git clone <llm-workbench-repo-url>
-cd llm-workbench
-npm run chat:list
-```
+npx llm-workbench init
+llm-workbench start "refactor auth flow"
 
-To install the workbench into another Git repo:
+This creates:
 
-```bash
-bash scripts/install.sh --dry-run /path/to/target/repo
-bash scripts/install.sh --apply /path/to/target/repo
-```
+* a new git branch for the chat
+* a dedicated worktree for the implementation
+* a session log under commitLogs/
+* helper commands for checkpointing and merge readiness
 
-Then open that target repo with your coding agent and follow its `AGENTS.md`.
-For an empty repository with no first commit yet, add `--init-commit` to the
-apply command.
+Common commands
 
-## Important Boundaries
+llm-workbench sessions
+llm-workbench start "add user settings page"
+llm-workbench checkpoint
+llm-workbench status
+llm-workbench merge-ready
 
-The workbench does not push to remotes, rewrite history, discard local work, or
-delete branches without explicit human approval.
+## Who is this for?
 
-The first chat in a target repo creates that repo's own `commitLogs/` inside
-the chat-owned worktree. The workbench does not copy session history from
-another repo.
+Developers using Claude Code, Codex, Cursor or Copilot coding assistants who want safer multi-session repo workflows.
 
-Installer and uninstall state is tracked in `.llm-workbench/install-manifest.tsv`
-inside the target repo. Uninstall removes only workbench-owned files, package
-scripts, and managed instruction blocks from that manifest.
+What it does not do
 
-Chat metadata is provider-neutral. Codex transcript discovery is supported, and
-other tools can supply `CHAT_TRANSCRIPT_PROVIDER`, `CHAT_TRANSCRIPT_PATH`,
-`CHAT_TRANSCRIPT_BYTES`, or `CHAT_TRANSCRIPT_SOURCE` when recording commits.
+* does not push to remote
+* does not rewrite history
+* does not delete branches without approval
+* does not require a specific LLM provider
 
 ## Learn More
 
