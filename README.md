@@ -1,5 +1,7 @@
 # llm-workbench
 
+A developer tool that makes AI coding sessions reproducible, isolated and mergeable. mo
+
 Run AI coding sessions in isolated git worktrees without dirtying `main`.
 
 ## Why use it?
@@ -39,13 +41,6 @@ This creates:
 * a session log under commitLogs/
 * helper commands for checkpointing and merge readiness
 
-## Common commands
-
-llm-workbench sessions
-llm-workbench start "add user settings page"
-llm-workbench checkpoint
-llm-workbench status
-llm-workbench merge-ready
 
 ## Who is this for?
 
@@ -57,11 +52,3 @@ Developers using Claude Code, Codex, Cursor or Copilot coding assistants who wan
 * does not rewrite history
 * does not delete branches without approval
 * does not require a specific LLM provider
-
-## Learn More
-
-- `docs/concepts.md`
-- `docs/install.md`
-- `docs/workflows.md`
-- `docs/adapting-to-your-repo.md`
-- `docs/public-beta-contract.md`
