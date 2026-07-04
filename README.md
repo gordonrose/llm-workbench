@@ -95,5 +95,5 @@ Install using:
 
 ```bash
 npx llm-workbench init
-llm-workbench start "refactor auth flow"
+llm-workbench start "your-prompt-here"
 ```
