@@ -63,11 +63,11 @@ npm run chat:new -- "your prompt here"
 
 This installs into your target repo:
 
-- `npm run chat:*` commands in `package.json`
-- helper scripts and automation
-- AGENTS.md configured for your coding assistant
-- `.llm-workbench/install-manifest.tsv` for safe uninstall
-- session logs under `commitLogs/` when chats run
+* Adds chat:* commands
+* Configures AGENTS.md
+* Installs workbench scripts
+* Enables safe uninstall
+* Creates session logs that track decisions and commit descriptions
 
 Each new llm-chat session then creates:
 
