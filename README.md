@@ -17,15 +17,13 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 * dirty main
 * abandoned branches
 
-↓
-
 ### After LLM-Workbench
 
 ```text
 Start chat
     │
     ▼
-Create worktree
+Create worktree/branch
     │
     ▼
 Code with AI
