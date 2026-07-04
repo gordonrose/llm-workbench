@@ -10,6 +10,23 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 
 ## Quick start
 
+## Quick start
+
+```bash
+git clone https://github.com/gordonrose/llm-workbench.git
+cd llm-workbench
+
+bash scripts/install.sh --dry-run /path/to/your/repo
+bash scripts/install.sh --apply /path/to/your/repo
+```
+Then in your repo:
+```
+npm run chat:list
+npm run chat:new -- "your prompt here"
+```
+
+
+### Coming Soon
 ```bash
 npx llm-workbench init
 llm-workbench start "refactor auth flow"
