@@ -211,11 +211,11 @@ require_grep 'stat -c' "$WORKBENCH_REPO/scripts/00.chat/transcript/discover-code
 require_grep 'ubuntu-latest' "$WORKBENCH_REPO/.github/workflows/portability.yml"
 require_grep 'macos-latest' "$WORKBENCH_REPO/.github/workflows/portability.yml"
 require_grep 'windows-latest' "$WORKBENCH_REPO/.github/workflows/portability.yml"
-require_grep '--dry-run' "$WORKBENCH_REPO/docs/install.md"
-require_grep '--apply' "$WORKBENCH_REPO/docs/install.md"
+require_grep 'npx llm-wb init --dry-run' "$WORKBENCH_REPO/docs/install.md"
+require_grep 'npx llm-wb init' "$WORKBENCH_REPO/docs/install.md"
 require_grep '--init-commit' "$WORKBENCH_REPO/docs/install.md"
 require_grep 'only for repos with no existing `HEAD`' "$WORKBENCH_REPO/docs/install.md"
-require_grep 'chat:new -- --json' "$WORKBENCH_REPO/docs/workflows.md"
+require_grep 'llm-wb new --json' "$WORKBENCH_REPO/docs/workflows.md"
 require_grep 'CHAT_TRANSCRIPT_PROVIDER' "$WORKBENCH_REPO/docs/workflows.md"
 
 (

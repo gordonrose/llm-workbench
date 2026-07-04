@@ -15,11 +15,14 @@ allowed. It does not assign the whole chat a durable layer, mode, or workflow.
 For assistants that can consume structured startup output:
 
 ```bash
-npm run chat:new -- --json "Describe the task"
+llm-wb new --json "Describe the prompt"
 ```
 
 The JSON packet includes the session log, chat-owned worktree, lifecycle
 workflow, latest context-packet references, and first prompt.
+
+Use `npx llm-wb ...` instead of `llm-wb ...` when the CLI is not installed
+globally or linked into your shell.
 
 ## Commit Work
 
@@ -31,6 +34,15 @@ Commit preparation is governed by:
 
 The before-commit gates check prerequisites, session log safety, deterministic
 process drift, metadata headers, and governed command drift.
+
+The public CLI shortcut is:
+
+```bash
+llm-wb commit -m "Describe the completed work"
+```
+
+This wraps the existing commit gates, creates the task commit, records it in the
+session log, and checkpoints session evidence.
 
 Transcript metrics are provider-neutral. Codex can use the bundled transcript
 adapter; other assistants can provide values with `CHAT_TRANSCRIPT_PROVIDER`,
@@ -52,6 +64,12 @@ Main refresh is governed by:
 
 The workflow separates read-only status, rehearsal, and apply.
 
+For active chat/session visibility today:
+
+```bash
+llm-wb sessions list
+```
+
 ## Promote To Main
 
 Promotion is governed by:
@@ -62,6 +80,12 @@ Promotion is governed by:
 
 The harness treats local merge readiness separately from remote push. A push
 always needs separate explicit approval.
+
+The current CLI shortcut verifies readiness and performs only the local merge:
+
+```bash
+llm-wb merge-main
+```
 
 ## Report Or Close A Chat
 
@@ -74,3 +98,6 @@ Reporting and closeout are governed by:
 
 These workflows help summarize work, inspect active workspaces, and clean up
 empty chat branches when it is safe.
+
+`llm-wb list` intentionally lists installed workbench commands. Use
+`llm-wb sessions list` to list active chat sessions.

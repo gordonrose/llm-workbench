@@ -18,6 +18,7 @@ git -C "$TARGET_REPO" config user.email "llm-workbench-smoke@example.invalid"
 bash "$WORKBENCH_REPO/scripts/install.sh" "$TARGET_REPO"
 
 test -f "$TARGET_REPO/AGENTS.md"
+test -f "$TARGET_REPO/bin/llm-workbench.js"
 test -d "$TARGET_REPO/.agentic/00.chat"
 test -d "$TARGET_REPO/scripts/00.chat"
 test -d "$TARGET_REPO/scripts/01.harness"
@@ -51,8 +52,9 @@ if grep -RIEq '\.agentic/01\.harness|scripts/02\.rag-rulebook|\.agentic/02\.rag-
 fi
 
 npm --prefix "$TARGET_REPO" run --silent chat:list >/dev/null
+node "$TARGET_REPO/bin/llm-workbench.js" --help >/dev/null
 
-git -C "$TARGET_REPO" add AGENTS.md package.json .agentic scripts
+git -C "$TARGET_REPO" add -A
 git -C "$TARGET_REPO" commit -q -m "Install llm-workbench harness"
 
 (

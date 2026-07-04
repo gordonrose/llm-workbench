@@ -13,7 +13,7 @@ promote reusable lessons back upstream.
 
 - chat startup and session logs under `commitLogs/`
 - chat-owned worktrees for implementation work
-- public `npm run chat:*` commands
+- public `llm-wb` CLI commands
 - governed script execution for repeatable helper commands
 - local merge readiness and main-refresh checks
 - onboarding docs for every chat script folder
@@ -21,21 +21,23 @@ promote reusable lessons back upstream.
 ## Quick Start
 
 ```bash
-git clone <llm-workbench-repo-url>
-cd llm-workbench
-npm run chat:list
+cd /path/to/target/repo
+
+npx llm-wb init --dry-run
+npx llm-wb init
 ```
 
-To install the workbench into another Git repo:
+Then start and inspect work from that repo:
 
 ```bash
-bash scripts/install.sh --dry-run /path/to/target/repo
-bash scripts/install.sh --apply /path/to/target/repo
+npx llm-wb new "Describe the prompt"
+npx llm-wb sessions list
+npx llm-wb commit -m "Describe the completed work"
+npx llm-wb merge-main
 ```
 
-Then open that target repo with your coding agent and follow its `AGENTS.md`.
-For an empty repository with no first commit yet, add `--init-commit` to the
-apply command.
+`llm-wb list` lists installed workbench commands. To list active chat sessions,
+use `llm-wb sessions list`.
 
 ## Important Boundaries
 

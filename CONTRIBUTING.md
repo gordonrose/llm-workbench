@@ -30,8 +30,8 @@ lesson promotion, update the relevant docs and tests in the same change.
 At minimum, check:
 
 ```bash
-npm run chat:list
 npm run test:install
+bash tests/smoke-test-cli.sh
 ```
 
 If you add or move a script, keep its nearby README current. The README should
