@@ -1,7 +1,15 @@
 # llm-workbench
 
-`llm-workbench` is a standalone, provider-neutral Git/Bash/npm chat harness for
-blank or existing repos, with safe install/uninstall, assistant adapters, JSON
+`llm-workbench` lets you have multiple chats open in yoir code editors
+and work on them in parallel without contaminating your local main branch.
+
+When you switch between LLM chat sessions - it creates a temporary worktree and branch for that session automatically. it also creates a commitLog for that session that tracks decisions, questions, amd commits automatically that goves you auditability and traceabity. 
+
+You can have multiple sessions open working with whichever LLM in vscode; it will keep a record of each one; let you iterate on each one and keep your local main clean until you’re ready to merge
+
+it is standalone, LLM provider-neutral (works with CLAUDE/Codex/Mistral)
+
+it works woth blank or existing repos, has a safe install/uninstall, assistant adapters, JSON
 startup packets, and portable transcript metadata across common CLI and
 code-assistant workflows.
 
