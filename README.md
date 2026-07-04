@@ -1,6 +1,6 @@
 # llm-workbench
 
-A developer tool that makes AI coding sessions reproducible, isolated and mergeable.
+LLM Workbench turns AI coding conversations into isolated, reproducible Git workspaces.
 
 Run AI coding sessions in isolated git worktrees without dirtying `main`.
 
@@ -11,7 +11,7 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 `llm-workbench` gives every chat session its own branch, worktree, and session log so you can experiment safely and merge only when ready.
 
 ### Before LLM-Workbench
-* one giant AI conversation
+* one long AI conversation trying to solve multiple problems
 * random commits
 * forgot why code changed
 * dirty main
@@ -20,6 +20,23 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 ↓
 
 ### After LLM-Workbench
+
+Start chat
+      │
+      ▼
+Create worktree
+      │
+      ▼
+Code with LLM
+      │
+      ▼
+Checkpoint
+      │
+      ▼
+Continue tomorrow
+      │
+      ▼
+Merge back to main
 
 * one branch per AI session
 * session logs
@@ -44,8 +61,8 @@ npm run chat:new -- "your prompt here"
 This installs into your target repo:
 
 - `npm run chat:*` commands in `package.json`
-- llm-workbench-owned helper scripts
-- `AGENTS.md` instructions for coding agents
+- helper scripts and automation
+- AGENTS.md configured for your coding assistant
 - `.llm-workbench/install-manifest.tsv` for safe uninstall
 - session logs under `commitLogs/` when chats run
 
@@ -55,6 +72,8 @@ Each new llm-chat session then creates:
 - a git worktree for that branch
 - a session log/checkpoint record
 - merge-readiness checks before promotion back to `main`
+
+Works with existing repositories. No migration required. Uninstall removes only files owned by LLM Workbench.
 
 ## Who is this for?
 
