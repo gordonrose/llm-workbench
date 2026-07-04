@@ -20,10 +20,13 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 ### After LLM-Workbench
 
 ```text
-Start chat
-    │
-    ▼
-Create worktree/branch
+Main
+    │.                         │
+    ▼.                         ▼
+Start chat #1.            Start chat #n
+    │.                         │
+    ▼.                         ▼
+Create worktree/branch.       ...
     │
     ▼
 Code with AI
