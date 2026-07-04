@@ -21,22 +21,24 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 
 ### After LLM-Workbench
 
+```text
 Start chat
-      │
-      ▼
+    │
+    ▼
 Create worktree
-      │
-      ▼
-Code with LLM
-      │
-      ▼
+    │
+    ▼
+Code with AI
+    │
+    ▼
 Checkpoint
-      │
-      ▼
+    │
+    ▼
 Continue tomorrow
-      │
-      ▼
+    │
+    ▼
 Merge back to main
+```
 
 * one branch per AI session
 * session logs
