@@ -41,14 +41,20 @@ npm run chat:list
 npm run chat:new -- "your prompt here"
 ```
 
-This creates:
+This installs into your target repo:
 
-* a new git branch for the chat
-* a dedicated worktree for the implementation
-* a session log under commitLogs/
-* helper commands for checkpointing and merge readiness
+- `npm run chat:*` commands in `package.json`
+- llm-workbench-owned helper scripts
+- `AGENTS.md` instructions for coding agents
+- `.llm-workbench/install-manifest.tsv` for safe uninstall
+- session logs under `commitLogs/` when chats run
 
+Each new llm-chat session then creates:
 
+- a chat-owned branch
+- a git worktree for that branch
+- a session log/checkpoint record
+- merge-readiness checks before promotion back to `main`
 
 ## Who is this for?
 
