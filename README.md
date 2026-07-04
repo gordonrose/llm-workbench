@@ -1,6 +1,6 @@
 # llm-workbench
 
-LLM Workbench turns AI coding conversations into isolated, reproducible Git workspaces.
+Turns AI coding conversations into isolated, reproducible Git workspaces.
 
 Run AI coding sessions in isolated git worktrees without dirtying `main`.
 
@@ -67,7 +67,7 @@ This installs into your target repo:
 * Configures AGENTS.md
 * Installs workbench scripts
 * Enables safe uninstall
-* Creates session logs that track decisions and commit descriptions
+* Creates session logs that preserve decisions, prompts and commit history.
 
 Each new llm-chat session then creates:
 
