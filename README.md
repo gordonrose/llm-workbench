@@ -1,6 +1,6 @@
 # llm-workbench
 
-`llm-workbench` lets you have multiple chats open in yoir code editors
+`llm-workbench` lets you have multiple chats open in your code editors
 and work on them in parallel without contaminating your local main branch.
 
 When you switch between LLM chat sessions - it creates a temporary worktree and branch for that session automatically. it also creates a commitLog for that session that tracks decisions, questions, amd commits automatically that goves you auditability and traceabity. 
