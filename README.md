@@ -10,7 +10,7 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 
 `llm-workbench` gives every chat session its own branch, worktree, and session log so you can experiment safely and merge only when ready.
 
-###Before LLM-Workbench
+### Before LLM-Workbench
 * one giant AI conversation
 * random commits
 * forgot why code changed
@@ -19,7 +19,7 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 
 ↓
 
-###After LLM-Workbench
+### After LLM-Workbench
 
 * one branch per AI session
 * session logs
