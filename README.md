@@ -1,6 +1,6 @@
 # llm-workbench
 
-A developer tool that makes AI coding sessions reproducible, isolated and mergeable. mo
+A developer tool that makes AI coding sessions reproducible, isolated and mergeable.
 
 Run AI coding sessions in isolated git worktrees without dirtying `main`.
 
@@ -10,7 +10,21 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 
 `llm-workbench` gives every chat session its own branch, worktree, and session log so you can experiment safely and merge only when ready.
 
-## Quick start
+###Before LLM-Workbench
+* one giant AI conversation
+* random commits
+* forgot why code changed
+* dirty main
+* abandoned branches
+
+↓
+
+###After LLM-Workbench
+
+* one branch per AI session
+* session logs
+* isolated worktrees
+* merge when ready
 
 ## Quick start
 
@@ -27,13 +41,6 @@ npm run chat:list
 npm run chat:new -- "your prompt here"
 ```
 
-
-### Coming Soon
-```bash
-npx llm-workbench init
-llm-workbench start "refactor auth flow"
-```
-
 This creates:
 
 * a new git branch for the chat
@@ -42,13 +49,23 @@ This creates:
 * helper commands for checkpointing and merge readiness
 
 
+
 ## Who is this for?
 
 Developers using Claude Code, Codex, Cursor or Copilot coding assistants who want safer multi-session repo workflows.
 
-## What it does not do
+## Security Boundaries
 
 * does not push to remote
 * does not rewrite history
 * does not delete branches without approval
 * does not require a specific LLM provider
+
+### Coming Soon
+
+Install using:
+
+```bash
+npx llm-workbench init
+llm-workbench start "refactor auth flow"
+```
