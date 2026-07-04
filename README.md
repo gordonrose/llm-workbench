@@ -9,7 +9,7 @@ You can have multiple sessions open working with whichever LLM in vscode; it wil
 
 it is standalone, LLM provider-neutral (works with CLAUDE/Codex/Mistral)
 
-it works woth blank or existing repos, has a safe install/uninstall, assistant adapters, JSON
+it works with blank or existing repos, has a safe install/uninstall, assistant adapters, JSON
 startup packets, and portable transcript metadata across common CLI and
 code-assistant workflows.
 
