@@ -13,6 +13,7 @@ AI coding tools are useful, but they make it easy to lose context, mix unrelated
 ```bash
 npx llm-workbench init
 llm-workbench start "refactor auth flow"
+```
 
 This creates:
 
@@ -21,7 +22,7 @@ This creates:
 * a session log under commitLogs/
 * helper commands for checkpointing and merge readiness
 
-Common commands
+## Common commands
 
 llm-workbench sessions
 llm-workbench start "add user settings page"
@@ -33,7 +34,7 @@ llm-workbench merge-ready
 
 Developers using Claude Code, Codex, Cursor or Copilot coding assistants who want safer multi-session repo workflows.
 
-What it does not do
+## What it does not do
 
 * does not push to remote
 * does not rewrite history
