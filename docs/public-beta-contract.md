@@ -21,7 +21,11 @@ handoffs, but each assistant decides how well it follows those instructions.
 - Cost metrics are unavailable by default until a pricing profile is selected.
 - Install and uninstall are manifest-backed and preserve user files.
 - Assistant adapters are thin routers to the canonical chat lifecycle workflow.
-- `chat:new -- --json` supports code-assistant startup handoff.
+- The public `llm-wb` CLI is a thin wrapper around the existing
+  installer, dispatcher, session-log, and local-merge scripts.
+- `llm-wb list` lists installed workbench commands. Active chat sessions are
+  listed with `llm-wb sessions list`.
+- `llm-wb new --json` supports code-assistant startup handoff.
 
 ## Required Checks
 
@@ -33,3 +37,9 @@ bash scripts/00.chat/upstream/validate-llm-workbench-portability/script.sh
 
 Public changes should also run the relevant focused smoke tests listed in the
 source repo standard.
+
+CLI-facing changes should run:
+
+```bash
+bash tests/smoke-test-cli.sh
+```

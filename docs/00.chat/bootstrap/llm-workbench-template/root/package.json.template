@@ -1,8 +1,80 @@
 {
-  "name": "llm-workbench",
-  "private": true,
-  "version": "0.0.0",
+  "name": "llm-wb",
+  "version": "0.1.0-beta.0",
   "description": "A portable chat harness for governed agentic development workflows.",
+  "license": "MIT",
+  "author": "Gordon Rose",
+  "homepage": "https://github.com/gordonrose/llm-workbench#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gordonrose/llm-workbench.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gordonrose/llm-workbench/issues"
+  },
+  "keywords": [
+    "agentic",
+    "chat",
+    "cli",
+    "git",
+    "llm",
+    "workbench"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "llm-wb": "bin/llm-workbench.js"
+  },
+  "files": [
+    ".agentic/00.chat/",
+    ".agentic/shared/",
+    ".cursor/rules/llm-workbench.mdc",
+    ".github/copilot-instructions.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "LLM_WORKBENCH.md",
+    "README.md",
+    "SECURITY.md",
+    "bin/",
+    "docs/00.chat/README.md",
+    "docs/00.chat/llm-workbench-acceptance-matrix.md",
+    "docs/00.chat/script-layout.md",
+    "docs/adapting-to-your-repo.md",
+    "docs/concepts.md",
+    "docs/install.md",
+    "docs/public-beta-contract.md",
+    "docs/workflows.md",
+    "examples/",
+    "scripts/00.chat/README.md",
+    "scripts/00.chat/bootstrap/",
+    "scripts/00.chat/closeout/",
+    "scripts/00.chat/command/",
+    "scripts/00.chat/git/",
+    "scripts/00.chat/local-merge/",
+    "scripts/00.chat/main-refresh/",
+    "scripts/00.chat/metrics/",
+    "scripts/00.chat/migration/",
+    "scripts/00.chat/recovery/",
+    "scripts/00.chat/reporting/",
+    "scripts/00.chat/session-log/",
+    "scripts/00.chat/startup/",
+    "scripts/00.chat/transcript/",
+    "scripts/00.chat/worktree/",
+    "scripts/01.harness/artifact-metadata/check-headers/script.sh",
+    "scripts/01.harness/artifact-metadata/check-headers/smoke-test.sh",
+    "scripts/01.harness/check-deterministic-process-drift.sh",
+    "scripts/01.harness/check-governed-script-command-drift.sh",
+    "scripts/01.harness/run-governed-script.sh",
+    "scripts/install.sh",
+    "scripts/uninstall.sh",
+    "tests/smoke-test-install.sh"
+  ],
   "scripts": {
     "chat": "bash scripts/00.chat/command/dispatcher/script.sh",
     "chat:list": "bash scripts/00.chat/command/dispatcher/script.sh list",

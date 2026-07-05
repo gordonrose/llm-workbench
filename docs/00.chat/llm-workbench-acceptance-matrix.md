@@ -32,7 +32,8 @@ This matrix maps the public-beta contract to the artifacts that enforce it.
 | Provider-neutral cost metrics | `estimate-chat-cost`, `scripts/00.chat/metrics/data/`, record-commit smoke test | Default pricing is `portable-unpriced`; explicit profile overrides record cost. |
 | Safe install/uninstall | Public install/uninstall templates, install smoke, portability validator | Dry run is read-only, apply preserves user files, uninstall removes only manifest-owned material. |
 | Thin assistant adapters | Public adapter templates, install manifest, portability validator | Adapters route to chat-start and avoid provider-specific policy duplication. |
-| CLI/code-assistant robustness | Dispatcher, startup JSON mode, portability validator | `chat:new -- --json` works; stripped executable bits do not break dispatch. |
+| Public CLI wrapper | `bin/llm-workbench.js`, package `bin`, package `files`, CLI smoke | `npm pack --dry-run` includes the CLI and required scripts; `init`, `list`, `sessions list`, `new`, `commit`, and `merge-main` are smoke-tested. |
+| CLI/code-assistant robustness | Dispatcher, startup JSON mode, portability validator | `llm-wb new --json` works; stripped executable bits do not break dispatch. |
 | Temporary eval loop | Public-beta checklist, closeout evidence | Temporary evals fail first, pass after implementation, and are removed before closeout. |
 | Documentation truthfulness | Public README/docs/templates | Public docs use the accepted standalone/provider-neutral claim and avoid universal-assistant overclaims. |
 

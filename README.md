@@ -48,22 +48,30 @@ Merge back to main
 
 ## Quick start
 
-```bash
-git clone https://github.com/gordonrose/llm-workbench.git
-cd llm-workbench
+Public npm install is the intended user path:
 
-bash scripts/install.sh --dry-run /path/to/your/repo
-bash scripts/install.sh --apply /path/to/your/repo
+```bash
+cd /path/to/your/repo
+
+npx llm-wb init --dry-run
+npx llm-wb init
 ```
-Then in your repo:
+
+Then start and inspect work from that repo:
+
+```bash
+npx llm-wb new "your prompt here"
+npx llm-wb sessions list
+npx llm-wb commit -m "Describe the completed work"
+npx llm-wb merge-main
 ```
-npm run chat:list
-npm run chat:new -- "your prompt here"
-```
+
+`llm-wb list` lists installed workbench commands. To list active chat sessions,
+use `llm-wb sessions list`.
 
 This installs into your target repo:
 
-* Adds chat:* commands
+* Adds the `llm-wb` CLI
 * Configures AGENTS.md
 * Installs workbench scripts
 * Enables safe uninstall
@@ -88,12 +96,3 @@ Developers using Claude Code, Codex, Cursor or Copilot coding assistants who wan
 * does not rewrite history
 * does not delete branches without approval
 * does not require a specific LLM provider
-
-### Coming Soon
-
-Install using:
-
-```bash
-npx llm-workbench init
-llm-workbench start "your-prompt-here"
-```

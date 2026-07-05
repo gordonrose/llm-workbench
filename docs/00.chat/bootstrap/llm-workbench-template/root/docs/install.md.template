@@ -4,15 +4,17 @@
 
 - Git
 - Bash
-- Node.js and npm for the `npm run chat:*` command surface
+- Node.js and npm for the `llm-wb` CLI
 
 ## Install Into A Target Repo
 
-From the `llm-workbench` repo:
+The intended public install path starts from the target Git repo:
 
 ```bash
-bash scripts/install.sh --dry-run /path/to/target/repo
-bash scripts/install.sh --apply /path/to/target/repo
+cd /path/to/target/repo
+
+npx llm-wb init --dry-run
+npx llm-wb init
 ```
 
 Dry-run mode prints the package and file plan without writing. Apply mode
@@ -22,12 +24,12 @@ The installer copies the workbench harness into the target Git repo. It does not
 copy `commitLogs/` from the workbench repo, overwrite existing assistant
 instruction files, or replace unrelated `package.json` scripts. Existing
 instruction files receive a managed `llm-workbench` block; package files are
-merged by adding workbench-owned `chat` and `chat:*` scripts only.
+merged instead of overwritten.
 
 For an empty Git repo with no first commit yet:
 
 ```bash
-bash scripts/install.sh --apply --init-commit /path/to/blank/repo
+npx llm-wb init --init-commit
 ```
 
 That creates an install commit after the clean plan is applied.
@@ -45,10 +47,13 @@ instead of creating source-specific harness governance in each target repo.
 From the target repo:
 
 ```bash
-npm run chat:list
+npx llm-wb list
+npx llm-wb sessions list
 ```
 
-The command should run without requiring a chat session.
+`llm-wb list` lists available installed workbench commands. `llm-wb sessions
+list` lists active chat sessions and branches. Both commands should run without
+requiring a current chat session.
 
 The public-beta contract is summarized in `docs/public-beta-contract.md`.
 
@@ -61,7 +66,7 @@ use the target repo as the source of truth.
 For tools that prefer machine-readable startup packets:
 
 ```bash
-npm run chat:new -- --json "Describe the task"
+npx llm-wb new --json "Describe the prompt"
 ```
 
 The JSON packet includes the session log, chat-owned worktree, lifecycle
@@ -95,11 +100,11 @@ without transcript metrics.
 
 ## Uninstall
 
-From the `llm-workbench` repo:
+From the target repo:
 
 ```bash
-bash scripts/uninstall.sh --dry-run /path/to/target/repo
-bash scripts/uninstall.sh --apply /path/to/target/repo
+bash scripts/uninstall.sh --dry-run .
+bash scripts/uninstall.sh --apply .
 ```
 
 Uninstall reads `.llm-workbench/install-manifest.tsv` from the target repo. It
