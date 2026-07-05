@@ -41,7 +41,7 @@ const files = new Set(pack.files.map((file) => file.path));
 if (manifest.name !== 'llm-wb') {
   throw new Error(`unexpected package name: ${manifest.name}`);
 }
-if (manifest.version !== '0.1.0-beta.0') {
+if (manifest.version !== '0.1.0-beta.1') {
   throw new Error(`unexpected package version: ${manifest.version}`);
 }
 if (Object.prototype.hasOwnProperty.call(manifest, 'private')) {
@@ -86,6 +86,11 @@ function rejectPrefix(prefix) {
 requireFile('bin/llm-workbench.js');
 requireFile('scripts/install.sh');
 requireFile('scripts/00.chat/command/dispatcher/script.sh');
+requireFile('scripts/00.chat/command/download-repo/script.sh');
+requireFile('scripts/00.chat/command/download-repo-diff/script.sh');
+requireFile('scripts/00.chat/export/create-worktree-bundle/script.js');
+requireFile('scripts/00.chat/export/worktree/script.sh');
+requireFile('scripts/00.chat/export/worktree-diff/script.sh');
 requireFile('scripts/00.chat/session-log/record-chat-commit/script.sh');
 requireFile('scripts/00.chat/local-merge/list-active-chat-branches/script.sh');
 requireFile('scripts/00.chat/local-merge/verify-chat-ready-to-merge-local-main/script.sh');

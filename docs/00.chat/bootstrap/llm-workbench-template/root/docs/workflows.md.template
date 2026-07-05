@@ -101,3 +101,22 @@ empty chat branches when it is safe.
 
 `llm-wb list` intentionally lists installed workbench commands. Use
 `llm-wb sessions list` to list active chat sessions.
+
+## Export Work For Review
+
+To send the active chat worktree to another model, engineer, or verification
+environment:
+
+```bash
+npm run chat -- download repo
+```
+
+To send only files changed relative to local `main`:
+
+```bash
+npm run chat -- download repo diff
+```
+
+Both commands create a zip review bundle outside the repo by default and include
+`llm-workbench-export-manifest.json` with branch, base ref, included files,
+deleted files, and untracked files.

@@ -11,7 +11,7 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "$TARGET_REPO"
-git -C "$TARGET_REPO" init -q
+git -C "$TARGET_REPO" init -q --initial-branch=main
 git -C "$TARGET_REPO" config user.name "llm-workbench smoke test"
 git -C "$TARGET_REPO" config user.email "llm-workbench-smoke@example.invalid"
 
@@ -56,6 +56,17 @@ node "$TARGET_REPO/bin/llm-workbench.js" --help >/dev/null
 
 git -C "$TARGET_REPO" add -A
 git -C "$TARGET_REPO" commit -q -m "Install llm-workbench harness"
+
+npm --prefix "$TARGET_REPO" run --silent chat:download-repo -- \
+  --output "$TMP_ROOT/install-full.zip" \
+  "$TARGET_REPO" >/dev/null
+npm --prefix "$TARGET_REPO" run --silent chat:download-repo-diff -- \
+  --base main \
+  --output "$TMP_ROOT/install-diff.zip" \
+  "$TARGET_REPO" >/dev/null
+
+test -f "$TMP_ROOT/install-full.zip"
+test -f "$TMP_ROOT/install-diff.zip"
 
 (
   cd "$TARGET_REPO"
