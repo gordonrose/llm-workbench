@@ -60,10 +60,10 @@ npx llm-wb init
 Then start and inspect work from that repo:
 
 ```bash
-npx llm-wb new "your prompt here"
-npx llm-wb sessions list
-npx llm-wb commit -m "Describe the completed work"
-npx llm-wb merge-main
+npx llm-wb new "your prompt here"  // creates new chat session with prompt; happens automatically if you start a chat in code-assistant
+npx llm-wb sessions list // lists open chat sessions
+npx llm-wb commit -m "Describe the completed work" // ask chat to commit - runs gates and checks
+npx llm-wb merge-main  // merges to local main, handles conflict
 ```
 
 `llm-wb list` lists installed workbench commands. To list active chat sessions,
