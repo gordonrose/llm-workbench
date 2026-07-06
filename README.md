@@ -2,6 +2,9 @@
 
 Turns AI coding conversations into isolated, reproducible Git workspaces.
 
+`llm-workbench` is a standalone, provider-neutral Git/Bash/npm chat harness for
+blank or existing repos.
+
 Run AI coding sessions in isolated git worktrees without dirtying `main`.
 
 ## Why use it?
@@ -57,6 +60,14 @@ npx llm-wb init --dry-run
 npx llm-wb init
 ```
 
+If your repo already has workbench files from an earlier manual copy or
+bootstrap, start with adoption instead:
+
+```bash
+npx llm-wb@latest adopt --dry-run
+npx llm-wb@latest adopt --apply
+```
+
 Then start and inspect work from that repo:
 
 ```bash
@@ -75,7 +86,27 @@ This installs into your target repo:
 * Configures AGENTS.md
 * Installs workbench scripts
 * Enables safe uninstall
+* Writes `.llm-workbench/lock.json` and `.llm-workbench/manifest.json`
 * Creates session logs that preserve decisions, prompts and commit history.
+
+Update to the latest published workbench with a dry run first:
+
+```bash
+npx llm-wb@latest update --dry-run
+npx llm-wb@latest update --apply
+```
+
+Roll back or test an older published version by pinning the package:
+
+```bash
+npx llm-wb@0.1.0-beta.0 update --dry-run
+npx llm-wb@0.1.0-beta.0 update --apply
+```
+
+Updates only replace files recorded as workbench-managed in
+`.llm-workbench/manifest.json`. Files such as `commitLogs/`, product code,
+branches, worktrees, and repo-specific layers are left alone. If a managed file
+was changed locally, update stops with a conflict instead of overwriting it.
 
 Each new llm-chat session then creates:
 
@@ -95,4 +126,5 @@ Developers using Claude Code, Codex, Cursor or Copilot coding assistants who wan
 * does not push to remote
 * does not rewrite history
 * does not delete branches without approval
+* does not overwrite locally changed managed files
 * does not require a specific LLM provider

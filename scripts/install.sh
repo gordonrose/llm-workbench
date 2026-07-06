@@ -99,6 +99,7 @@ FILE_ACTIONS="$TMP_DIR/file-actions.tsv"
 PACKAGE_OUTPUT="$TMP_DIR/package-output.txt"
 MANIFEST_OUTPUT="$TMP_DIR/install-manifest.tsv"
 MANIFEST_PATH="$TARGET_REPO/.llm-workbench/install-manifest.tsv"
+OWNERSHIP_SCRIPT="$SOURCE_REPO/bin/llm-workbench-ownership.js"
 
 cleanup() {
   rm -rf "$TMP_DIR"
@@ -462,6 +463,12 @@ apply_plan() {
   mkdir -p "$(dirname "$MANIFEST_PATH")"
   cp "$MANIFEST_OUTPUT" "$MANIFEST_PATH"
   echo "Wrote install manifest: ${MANIFEST_PATH#$TARGET_REPO/}"
+
+  node "$OWNERSHIP_SCRIPT" write-install-state \
+    "$SOURCE_REPO" \
+    "$TARGET_REPO" \
+    "$FILE_ACTIONS" \
+    "$PACKAGE_OUTPUT"
 }
 
 if [ "$MODE" = "apply" ]; then
@@ -488,6 +495,8 @@ stage_install_paths() {
   done < "$MANIFEST_OUTPUT"
 
   git -C "$TARGET_REPO" add -- .llm-workbench/install-manifest.tsv
+  git -C "$TARGET_REPO" add -- .llm-workbench/lock.json
+  git -C "$TARGET_REPO" add -- .llm-workbench/manifest.json
 }
 
 if [ "$INIT_COMMIT" = "yes" ] && [ "$MODE" = "apply" ]; then

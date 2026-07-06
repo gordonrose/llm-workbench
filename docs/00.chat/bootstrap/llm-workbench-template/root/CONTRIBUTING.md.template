@@ -24,15 +24,21 @@ to review and safer for downstream repos.
 ## Before Changing Harness Behavior
 
 If a change affects chat startup, branch/worktree handling, commit gates,
-refresh from `main`, local merge readiness, install/uninstall, or reusable
-lesson promotion, update the relevant docs and tests in the same change.
+refresh from `main`, local merge readiness, install/adopt/update/uninstall, or
+reusable lesson promotion, update the relevant docs and tests in the same
+change.
 
 At minimum, check:
 
 ```bash
 npm run test:install
 bash tests/smoke-test-cli.sh
+bash tests/smoke-test-adopt-update.sh
 ```
+
+For update behavior, prove both directions: latest-style forward update and
+rollback through a pinned older package version. Also prove that local edits to
+manifest-owned files produce conflicts instead of silent overwrites.
 
 If you add or move a script, keep its nearby README current. The README should
 teach a new reader what the script does, when it runs, what it writes, and what

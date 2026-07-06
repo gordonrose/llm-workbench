@@ -25,6 +25,8 @@ node "$CLI" --help > "$TMP_ROOT/help.out"
 grep -q '^llm-wb$' "$TMP_ROOT/help.out" || fail "help did not print short command name"
 grep -q '^Usage:' "$TMP_ROOT/help.out" || fail "help did not print usage"
 grep -q '^  init ' "$TMP_ROOT/help.out" || fail "help did not list init"
+grep -q '^  adopt ' "$TMP_ROOT/help.out" || fail "help did not list adopt"
+grep -q '^  update ' "$TMP_ROOT/help.out" || fail "help did not list update"
 grep -q '^  new ' "$TMP_ROOT/help.out" || fail "help did not list new"
 grep -q '^  sessions list ' "$TMP_ROOT/help.out" || fail "help did not list sessions list"
 grep -q '^  commit ' "$TMP_ROOT/help.out" || fail "help did not list commit"
@@ -84,6 +86,7 @@ function rejectPrefix(prefix) {
 }
 
 requireFile('bin/llm-workbench.js');
+requireFile('bin/llm-workbench-ownership.js');
 requireFile('scripts/install.sh');
 requireFile('scripts/00.chat/command/dispatcher/script.sh');
 requireFile('scripts/00.chat/command/download-repo/script.sh');
@@ -95,6 +98,7 @@ requireFile('scripts/00.chat/session-log/record-chat-commit/script.sh');
 requireFile('scripts/00.chat/local-merge/list-active-chat-branches/script.sh');
 requireFile('scripts/00.chat/local-merge/verify-chat-ready-to-merge-local-main/script.sh');
 requireFile('scripts/01.harness/run-governed-script.sh');
+requireFile('tests/smoke-test-adopt-update.sh');
 rejectPrefix('commitLogs/');
 rejectPrefix('docs/00.chat/bootstrap/');
 rejectPrefix('scripts/00.chat/upstream/');
@@ -121,10 +125,14 @@ grep -q '^ERROR: llm-workbench install has not been run in this repo: ' "$TMP_RO
 node "$CLI" init --dry-run --target "$TARGET_REPO" > "$TMP_ROOT/init-dry-run.out"
 grep -q '^mode: dry-run$' "$TMP_ROOT/init-dry-run.out" || fail "init dry-run did not call installer dry-run"
 test ! -e "$TARGET_REPO/.llm-workbench/install-manifest.tsv" || fail "dry-run wrote install manifest"
+test ! -e "$TARGET_REPO/.llm-workbench/lock.json" || fail "dry-run wrote lock"
+test ! -e "$TARGET_REPO/.llm-workbench/manifest.json" || fail "dry-run wrote manifest"
 
 node "$CLI" init --target "$TARGET_REPO" > "$TMP_ROOT/init-apply.out"
 grep -q '^mode: apply$' "$TMP_ROOT/init-apply.out" || fail "init apply did not call installer apply"
 test -f "$TARGET_REPO/.llm-workbench/install-manifest.tsv" || fail "apply did not write install manifest"
+test -f "$TARGET_REPO/.llm-workbench/lock.json" || fail "apply did not write lock"
+test -f "$TARGET_REPO/.llm-workbench/manifest.json" || fail "apply did not write manifest"
 
 (
   cd "$TARGET_REPO"
