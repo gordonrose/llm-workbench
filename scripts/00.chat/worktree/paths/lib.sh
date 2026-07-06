@@ -43,6 +43,11 @@ chat_worktree_safe_name() {
 
 chat_worktree_shell_path() {
   local path_value="$1"
+
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -m "$path_value" 2>/dev/null && return 0
+  fi
+
   printf '%s\n' "${path_value//\\//}"
 }
 

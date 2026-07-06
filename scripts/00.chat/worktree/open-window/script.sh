@@ -90,6 +90,11 @@ resolve_target() {
 
 normalize_shell_path() {
   local path_value="$1"
+
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -u "$path_value" 2>/dev/null && return 0
+  fi
+
   printf '%s\n' "${path_value//\\//}"
 }
 
