@@ -74,6 +74,7 @@
     "scripts/01.harness/run-governed-script.sh",
     "scripts/install.sh",
     "scripts/uninstall.sh",
+    "tests/smoke-test-adopt-update.sh",
     "tests/smoke-test-install.sh"
   ],
   "scripts": {
@@ -91,6 +92,7 @@
     "chat:record-main-refresh-conflict": "bash scripts/00.chat/session-log/record-main-refresh-conflict/script.sh",
     "chat:report-workspaces": "bash scripts/00.chat/reporting/report-chat-workspaces/script.sh",
     "chat:smoke-package-scripts": "bash scripts/00.chat/command/package-scripts/smoke-test.sh",
+    "test:adopt-update": "bash tests/smoke-test-adopt-update.sh",
     "test:install": "bash tests/smoke-test-install.sh"
   }
 }

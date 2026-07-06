@@ -1,36 +1,77 @@
 # llm-workbench
 
+Turns AI coding conversations into isolated, reproducible Git workspaces.
+
 `llm-workbench` is a standalone, provider-neutral Git/Bash/npm chat harness for
-blank or existing repos, with safe install/uninstall, assistant adapters, JSON
-startup packets, and portable transcript metadata across common CLI and
-code-assistant workflows.
+blank or existing repos.
 
-It gives a Git repo a repeatable way to start work in chat-owned branches and
-worktrees, record session logs, run commit gates, refresh from local `main`, and
-promote reusable lessons back upstream.
+Run AI coding sessions in isolated git worktrees without dirtying `main`.
 
-## What You Get
+## Why use it?
 
-- chat startup and session logs under `commitLogs/`
-- chat-owned worktrees for implementation work
-- public `llm-wb` CLI commands
-- governed script execution for repeatable helper commands
-- local merge readiness and main-refresh checks
-- onboarding docs for every chat script folder
+AI coding tools are useful, but they make it easy to lose context, mix unrelated changes, or pollute your main branch.
 
-## Quick Start
+`llm-workbench` gives every chat session its own branch, worktree, and session log so you can experiment safely and merge only when ready.
+
+### Before LLM-Workbench
+* one long AI conversation trying to solve multiple problems
+* random commits
+* forgot why code changed
+* dirty main
+* abandoned branches
+
+### After LLM-Workbench
+
+```text
+Main
+    │.                         │
+    ▼.                         ▼
+Start chat #1.            Start chat #n
+    │.                         │
+    ▼.                         ▼
+Create worktree/branch.       ...
+    │
+    ▼
+Code with AI
+    │
+    ▼
+Checkpoint
+    │
+    ▼
+Continue tomorrow
+    │
+    ▼
+Merge back to main
+```
+
+* one branch per AI session
+* session logs
+* isolated worktrees
+* merge when ready
+
+## Quick start
+
+Public npm install is the intended user path:
 
 ```bash
-cd /path/to/target/repo
+cd /path/to/your/repo
 
 npx llm-wb init --dry-run
 npx llm-wb init
 ```
 
+If your repo already has workbench files from an earlier manual copy or
+bootstrap, start with adoption instead:
+
+```bash
+npx llm-wb@latest adopt --dry-run
+npx llm-wb@latest adopt --apply
+```
+
 Then start and inspect work from that repo:
 
 ```bash
-npx llm-wb new "Describe the prompt"
+npx llm-wb new "your prompt here"
 npx llm-wb sessions list
 npx llm-wb commit -m "Describe the completed work"
 npx llm-wb merge-main
@@ -39,27 +80,51 @@ npx llm-wb merge-main
 `llm-wb list` lists installed workbench commands. To list active chat sessions,
 use `llm-wb sessions list`.
 
-## Important Boundaries
+This installs into your target repo:
 
-The workbench does not push to remotes, rewrite history, discard local work, or
-delete branches without explicit human approval.
+* Adds the `llm-wb` CLI
+* Configures AGENTS.md
+* Installs workbench scripts
+* Enables safe uninstall
+* Writes `.llm-workbench/lock.json` and `.llm-workbench/manifest.json`
+* Creates session logs that preserve decisions, prompts and commit history.
 
-The first chat in a target repo creates that repo's own `commitLogs/` inside
-the chat-owned worktree. The workbench does not copy session history from
-another repo.
+Update to the latest published workbench with a dry run first:
 
-Installer and uninstall state is tracked in `.llm-workbench/install-manifest.tsv`
-inside the target repo. Uninstall removes only workbench-owned files, package
-scripts, and managed instruction blocks from that manifest.
+```bash
+npx llm-wb@latest update --dry-run
+npx llm-wb@latest update --apply
+```
 
-Chat metadata is provider-neutral. Codex transcript discovery is supported, and
-other tools can supply `CHAT_TRANSCRIPT_PROVIDER`, `CHAT_TRANSCRIPT_PATH`,
-`CHAT_TRANSCRIPT_BYTES`, or `CHAT_TRANSCRIPT_SOURCE` when recording commits.
+Roll back or test an older published version by pinning the package:
 
-## Learn More
+```bash
+npx llm-wb@0.1.0-beta.0 update --dry-run
+npx llm-wb@0.1.0-beta.0 update --apply
+```
 
-- `docs/concepts.md`
-- `docs/install.md`
-- `docs/workflows.md`
-- `docs/adapting-to-your-repo.md`
-- `docs/public-beta-contract.md`
+Updates only replace files recorded as workbench-managed in
+`.llm-workbench/manifest.json`. Files such as `commitLogs/`, product code,
+branches, worktrees, and repo-specific layers are left alone. If a managed file
+was changed locally, update stops with a conflict instead of overwriting it.
+
+Each new llm-chat session then creates:
+
+- a chat-owned branch
+- a git worktree for that branch
+- a session log/checkpoint record
+- merge-readiness checks before promotion back to `main`
+
+Works with existing repositories. No migration required. Uninstall removes only files owned by LLM Workbench.
+
+## Who is this for?
+
+Developers using Claude Code, Codex, Cursor or Copilot coding assistants who want safer multi-session repo workflows.
+
+## Security Boundaries
+
+* does not push to remote
+* does not rewrite history
+* does not delete branches without approval
+* does not overwrite locally changed managed files
+* does not require a specific LLM provider

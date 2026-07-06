@@ -7,8 +7,10 @@ const { spawnSync } = require('node:child_process');
 
 const PACKAGE_ROOT = path.resolve(__dirname, '..');
 const INSTALL_SCRIPT = path.join(PACKAGE_ROOT, 'scripts', 'install.sh');
+const OWNERSHIP_SCRIPT = path.join(PACKAGE_ROOT, 'bin', 'llm-workbench-ownership.js');
 
 const INSTALLED_MANIFEST = path.join('.llm-workbench', 'install-manifest.tsv');
+const INSTALLED_JSON_MANIFEST = path.join('.llm-workbench', 'manifest.json');
 const DISPATCHER_SCRIPT = path.join('scripts', '00.chat', 'command', 'dispatcher', 'script.sh');
 const NEW_COMMAND_SCRIPT = path.join('scripts', '00.chat', 'command', 'new', 'script.sh');
 const START_NEW_CHAT_SCRIPT = path.join('scripts', '00.chat', 'startup', 'start-new-chat', 'script.sh');
@@ -31,6 +33,12 @@ Commands:
   init [--target <repo>] [--dry-run|--apply] [--init-commit]
       Install the workbench harness into a Git repo. Defaults to the current repo.
 
+  adopt [--target <repo>] [--dry-run|--apply]
+      Adopt existing workbench files and write ownership state. Defaults to dry-run.
+
+  update [--target <repo>] [--dry-run|--apply]
+      Update manifest-owned workbench files. Defaults to dry-run.
+
   list
       List available installed chat commands from the current Git repo.
 
@@ -52,6 +60,8 @@ Commands:
 Examples:
   llm-wb init --dry-run
   llm-wb init --target /path/to/repo
+  llm-wb adopt --dry-run
+  llm-wb update --dry-run
   llm-wb new "implement the checkout flow"
   llm-wb sessions list
   llm-wb commit -m "Implement checkout flow"
@@ -176,7 +186,10 @@ function requirePackageScript(relativePath) {
 }
 
 function requireInstalledWorkbench(repoRoot) {
-  if (!fs.existsSync(path.join(repoRoot, INSTALLED_MANIFEST))) {
+  if (
+    !fs.existsSync(path.join(repoRoot, INSTALLED_MANIFEST))
+    && !fs.existsSync(path.join(repoRoot, INSTALLED_JSON_MANIFEST))
+  ) {
     fail(`llm-workbench install has not been run in this repo: ${repoRoot}\nRun: llm-wb init`);
   }
 }
@@ -612,6 +625,54 @@ function commandInit(args) {
   run('bash', [installScript, mode, ...installArgs, repoRoot], { cwd: PACKAGE_ROOT });
 }
 
+function parseOwnershipArgs(args) {
+  let target = process.cwd();
+  let mode = '--dry-run';
+  let sawMode = false;
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+
+    switch (arg) {
+      case '-h':
+      case '--help':
+        printHelp();
+        process.exit(0);
+        break;
+      case '--target':
+        if (index + 1 >= args.length) {
+          fail('--target requires a repo path', 2);
+        }
+        target = args[index + 1];
+        index += 1;
+        break;
+      case '--dry-run':
+      case '--apply':
+        if (sawMode) {
+          fail('choose only one of --dry-run or --apply', 2);
+        }
+        mode = arg;
+        sawMode = true;
+        break;
+      default:
+        if (arg.startsWith('-')) {
+          fail(`unknown ownership option: ${arg}`, 2);
+        }
+        fail(`unexpected ownership argument: ${arg}`, 2);
+    }
+  }
+
+  return { target, mode };
+}
+
+function commandOwnership(command, args) {
+  const { target, mode } = parseOwnershipArgs(args);
+  const repoRoot = requireGitRepo(path.resolve(target));
+  const ownershipScript = requirePackageScript(path.relative(PACKAGE_ROOT, OWNERSHIP_SCRIPT));
+
+  run('node', [ownershipScript, command, mode, '--target', repoRoot], { cwd: PACKAGE_ROOT });
+}
+
 function commandList(args) {
   if (args.length > 0) {
     fail('list does not accept arguments', 2);
@@ -648,6 +709,12 @@ function main(argv) {
   switch (command) {
     case 'init':
       commandInit(args);
+      break;
+    case 'adopt':
+      commandOwnership('adopt', args);
+      break;
+    case 'update':
+      commandOwnership('update', args);
       break;
     case 'list':
       commandList(args);

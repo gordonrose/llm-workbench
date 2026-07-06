@@ -36,11 +36,78 @@ That creates an install commit after the clean plan is applied.
 `--init-commit` is only for repos with no existing `HEAD`; existing repos should
 review and commit the install changes through their normal process. The install
 commit stages only workbench-owned files, managed instruction blocks,
-`package.json` when workbench scripts were added, and the install manifest.
+`package.json` when workbench scripts were added, and the workbench manifests.
+
+Apply mode writes:
+
+```txt
+.llm-workbench/
+  install-manifest.tsv
+  lock.json
+  manifest.json
+```
+
+The TSV manifest is kept for uninstall compatibility. `lock.json` records the
+installed package version. `manifest.json` records which files, instruction
+blocks, and package scripts are managed by `llm-workbench` for future updates.
 
 Target installs do not copy the upstream `.agentic/01.harness` maintenance
 tree. Reusable harness lessons should be promoted back to `llm-workbench`
 instead of creating source-specific harness governance in each target repo.
+
+## Adopt Existing Workbench Files
+
+Use adoption when a repo already contains workbench files from an earlier manual
+copy, bootstrap, or source-repo migration:
+
+```bash
+npx llm-wb@latest adopt --dry-run
+npx llm-wb@latest adopt --apply
+```
+
+Dry run prints classifications without writing:
+
+```txt
+ADOPT path              file matches the packaged workbench
+CREATE path             file is missing and can be created
+PATCH_BLOCK path        repo-owned instruction file can receive a managed block
+ADOPT_BLOCK path        existing managed block matches the package
+DIFF path               existing file differs and needs a human decision
+DIFF_BLOCK path         existing managed block differs
+LOCAL_ONLY path         target repo file is not workbench-managed
+```
+
+Apply is refused while any `DIFF` or `DIFF_BLOCK` remains. Adoption does not
+claim ownership of `.git/`, `commitLogs/`, `node_modules/`, or existing
+`.llm-workbench/` state.
+
+## Update Or Roll Back
+
+Use update after install or adopt has written `.llm-workbench/manifest.json`:
+
+```bash
+npx llm-wb@latest update --dry-run
+npx llm-wb@latest update --apply
+```
+
+Update compares three things:
+
+- the checksum recorded in `.llm-workbench/manifest.json`
+- the current target repo file or managed block
+- the file or managed block in the package version being run
+
+If the target still matches the recorded checksum, update can replace the
+managed file, patch the managed block, or refresh a managed package script. If
+the target changed locally, update reports a conflict and refuses apply.
+
+Rollback uses the same command with an older package version:
+
+```bash
+npx llm-wb@0.1.0-beta.0 update --dry-run
+npx llm-wb@0.1.0-beta.0 update --apply
+```
+
+Rollback obeys the same conflict rules as forward update.
 
 ## Verify The Install
 
