@@ -28,7 +28,8 @@ usage() {
 Usage: open-window [worktree-path|session-log]
 
 Opens the current chat worktree in a new VS Code window. If an argument is
-provided, it may be a worktree path or a session-log README.md path.
+provided, it may be a verified chat-owned worktree path or a session-log
+README.md path.
 EOF
 }
 
@@ -72,22 +73,6 @@ resolve_current_worktree() {
   printf '%s\n' "$worktree"
 }
 
-resolve_target() {
-  local candidate="$1"
-
-  if [ -z "${candidate// }" ]; then
-    resolve_current_worktree
-    return
-  fi
-
-  if [ -f "$candidate" ]; then
-    chat_log_metadata_value "$candidate" "worktree"
-    return
-  fi
-
-  printf '%s\n' "$candidate"
-}
-
 normalize_shell_path() {
   local path_value="$1"
 
@@ -98,22 +83,102 @@ normalize_shell_path() {
   printf '%s\n' "${path_value//\\//}"
 }
 
-WORKTREE_PATH="$(normalize_shell_path "$(resolve_target "$target")")"
+canonical_dir() {
+  local dir="$1"
+
+  dir="$(normalize_shell_path "$dir")"
+  cd "$dir" && pwd -P
+}
+
+resolve_target() {
+  local candidate="$1"
+  local candidate_path
+
+  if [ -z "${candidate// }" ]; then
+    resolve_current_worktree
+    return
+  fi
+
+  candidate_path="$(normalize_shell_path "$candidate")"
+  if [ -f "$candidate_path" ]; then
+    chat_log_metadata_value "$candidate_path" "worktree"
+    return
+  fi
+
+  printf '%s\n' "$candidate"
+}
+
+verify_chat_owned_worktree() {
+  local candidate_path="$1"
+  local target_root target_branch target_session_id log_file declared_branch declared_worktree declared_path declared_root
+
+  candidate_path="$(normalize_shell_path "$candidate_path")"
+
+  if [ ! -d "$candidate_path" ]; then
+    echo "ERROR: chat worktree path does not exist: $candidate_path" >&2
+    return 1
+  fi
+
+  if ! git -C "$candidate_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "ERROR: path is not a git worktree: $candidate_path" >&2
+    return 1
+  fi
+
+  target_root="$(git -C "$candidate_path" rev-parse --show-toplevel)"
+  target_root="$(canonical_dir "$target_root")"
+  target_branch="$(git -C "$target_root" branch --show-current)"
+
+  if ! target_session_id="$(chat_session_id_from_branch "$target_branch")"; then
+    echo "ERROR: refusing to open non-chat worktree branch: $target_branch" >&2
+    echo "Use the chat open-window command from a chat branch or pass a chat-owned worktree/session log." >&2
+    return 1
+  fi
+
+  log_file="$target_root/$(chat_log_file_for_session "$target_session_id")"
+  if [ ! -f "$log_file" ]; then
+    echo "ERROR: missing session log for chat worktree: $log_file" >&2
+    return 1
+  fi
+
+  declared_branch="$(chat_log_metadata_value "$log_file" "branch")"
+  if [ "$declared_branch" != "$target_branch" ]; then
+    echo "ERROR: session log branch does not match target worktree." >&2
+    echo "  log branch: ${declared_branch:-<blank>}" >&2
+    echo "  worktree branch: $target_branch" >&2
+    return 1
+  fi
+
+  declared_worktree="$(chat_log_metadata_value "$log_file" "worktree")"
+  if [ -z "${declared_worktree// }" ]; then
+    echo "ERROR: session log is missing worktree metadata: $log_file" >&2
+    return 1
+  fi
+
+  declared_path="$(normalize_shell_path "$declared_worktree")"
+  if [ ! -d "$declared_path" ]; then
+    echo "ERROR: declared chat worktree does not exist: $declared_path" >&2
+    return 1
+  fi
+
+  declared_root="$(canonical_dir "$declared_path")"
+  if [ "$declared_root" != "$target_root" ]; then
+    echo "ERROR: refusing to open path that is not the declared chat-owned worktree." >&2
+    echo "  requested: $target_root" >&2
+    echo "  declared:  $declared_root" >&2
+    return 1
+  fi
+
+  printf '%s\n' "$target_root"
+}
+
+WORKTREE_PATH="$(resolve_target "$target")"
 
 if [ -z "${WORKTREE_PATH// }" ]; then
   echo "ERROR: could not resolve chat worktree path." >&2
   exit 1
 fi
 
-if [ ! -d "$WORKTREE_PATH" ]; then
-  echo "ERROR: chat worktree path does not exist: $WORKTREE_PATH" >&2
-  exit 1
-fi
-
-if ! git -C "$WORKTREE_PATH" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  echo "ERROR: path is not a git worktree: $WORKTREE_PATH" >&2
-  exit 1
-fi
+WORKTREE_PATH="$(verify_chat_owned_worktree "$WORKTREE_PATH")"
 
 case "${CHAT_OPEN_WORKTREE_WINDOW:-open}" in
   open|"")
