@@ -52,6 +52,8 @@ The script verifies:
 - canonical `.agentic/00.chat/checklists/before-commit.md` exists
 - executable script references in the workflow and checklist point to real
   `.sh` files
+- the optional repository extension hook at `scripts/repo/commit-gates/script.sh`
+  may be absent in a base install
 
 Directory prose such as `scripts/00.chat/` is ignored; only script-looking
 references ending in `.sh` are treated as gate references.
@@ -71,6 +73,7 @@ references ending in `.sh` are treated as gate references.
 
 - a valid workflow/checklist setup passes
 - prose directory references are not mistaken for missing scripts
+- the optional repository extension hook may be referenced without being present
 
 Run the canonical smoke test with:
 

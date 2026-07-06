@@ -69,11 +69,15 @@ New scripts and harness/process Markdown documents must declare metadata
 headers before entering the repo. Existing files are backfilled in focused
 batches.
 
-## Optional Commit Gates
+## Repository Extensions
 
-If this repo defines an optional layer-level commit gate, run that gate
-according to the repo's local instructions. The base llm-workbench install does
-not require any product, deployment, retrieval, or rulebook layer.
+If the repository provides an optional before-commit extension hook at
+`scripts/repo/commit-gates/script.sh`, the commit readiness gate runs it.
+
+This chat checklist does not know which repository-specific, harness-specific,
+or layer-specific checks exist. The repository extension hook owns that
+selection. The base llm-workbench install does not require a repository
+extension hook.
 
 ## llm-workbench Public-Beta Contract
 
