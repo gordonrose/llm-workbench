@@ -42,7 +42,8 @@ chat_worktree_safe_name() {
 }
 
 chat_worktree_shell_path() {
-  printf '%s\n' "$1" | sed 's#\\#/#g'
+  local path_value="$1"
+  printf '%s\n' "${path_value//\\//}"
 }
 
 chat_worktree_root_for_repo() {

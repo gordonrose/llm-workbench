@@ -88,7 +88,12 @@ resolve_target() {
   printf '%s\n' "$candidate"
 }
 
-WORKTREE_PATH="$(resolve_target "$target")"
+normalize_shell_path() {
+  local path_value="$1"
+  printf '%s\n' "${path_value//\\//}"
+}
+
+WORKTREE_PATH="$(normalize_shell_path "$(resolve_target "$target")")"
 
 if [ -z "${WORKTREE_PATH// }" ]; then
   echo "ERROR: could not resolve chat worktree path." >&2
