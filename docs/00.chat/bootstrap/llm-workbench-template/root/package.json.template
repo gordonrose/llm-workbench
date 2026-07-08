@@ -1,6 +1,6 @@
 {
   "name": "llm-wb",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "description": "A portable chat harness for governed agentic development workflows.",
   "license": "MIT",
   "author": "Gordon Rose",

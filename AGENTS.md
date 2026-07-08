@@ -12,6 +12,7 @@ Do not add project-specific or procedural rules here.
 2. Use the current branch's `commitLogs/<session>/README.md` session metadata
    as the first source of truth for chat lifecycle, branch, worktree, latest
    context packet references, commits, and metrics.
+<!-- deterministic-check: allow reason="prompt routing may be manual or repo-specific; no universal script can decide whether a context router exists" -->
 3. Do not assign the whole chat a durable layer, mode, or workflow. Use the
    current user request, this repo's assistant instructions, and any
    repo-provided context router if one exists when a prompt needs layer, mode,
