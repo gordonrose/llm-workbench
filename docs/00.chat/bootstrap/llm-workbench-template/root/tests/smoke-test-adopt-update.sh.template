@@ -40,13 +40,31 @@ make_repo() {
 TARGET_REPO="$TMP_ROOT/target"
 make_repo "$TARGET_REPO"
 
-node "$CLI" init --target "$TARGET_REPO" > "$TMP_ROOT/init.out"
+BASE_WORKBENCH="$TMP_ROOT/base-workbench"
+cp -R "$WORKBENCH_REPO" "$BASE_WORKBENCH"
+node - "$BASE_WORKBENCH" <<'NODE'
+const fs = require('fs');
+const path = require('path');
+const root = process.argv[2];
+for (const relativePath of [
+  'package.json',
+  'docs/00.chat/bootstrap/llm-workbench-template/root/package.json.template',
+]) {
+  const packagePath = path.join(root, relativePath);
+  const manifest = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+  manifest.version = '0.1.0-beta.1';
+  fs.writeFileSync(packagePath, `${JSON.stringify(manifest, null, 2)}\n`);
+}
+NODE
+BASE_CLI="$BASE_WORKBENCH/bin/llm-workbench.js"
+
+node "$BASE_CLI" init --target "$TARGET_REPO" > "$TMP_ROOT/init.out"
 require_grep '^Wrote llm-workbench lock: \.llm-workbench/lock\.json$' "$TMP_ROOT/init.out"
 require_grep '^Wrote llm-workbench manifest: \.llm-workbench/manifest\.json$' "$TMP_ROOT/init.out"
 test -f "$TARGET_REPO/.llm-workbench/lock.json" || fail "install did not write lock.json"
 test -f "$TARGET_REPO/.llm-workbench/manifest.json" || fail "install did not write manifest.json"
 
-node "$CLI" update --target "$TARGET_REPO" --dry-run > "$TMP_ROOT/update-clean.out"
+node "$BASE_CLI" update --target "$TARGET_REPO" --dry-run > "$TMP_ROOT/update-clean.out"
 require_grep '^llm-workbench update dry-run$' "$TMP_ROOT/update-clean.out"
 require_grep '^same: ' "$TMP_ROOT/update-clean.out"
 require_grep '^conflicts: 0$' "$TMP_ROOT/update-clean.out"
@@ -86,13 +104,13 @@ if (lock.version !== '0.1.0-beta.2') {
 }
 NODE
 
-node "$CLI" update --target "$TARGET_REPO" --dry-run > "$TMP_ROOT/rollback-dry-run.out"
+node "$BASE_CLI" update --target "$TARGET_REPO" --dry-run > "$TMP_ROOT/rollback-dry-run.out"
 require_grep '^Current version: 0\.1\.0-beta\.2$' "$TMP_ROOT/rollback-dry-run.out"
 require_grep '^Target version: 0\.1\.0-beta\.1$' "$TMP_ROOT/rollback-dry-run.out"
 require_grep '^UPDATE LLM_WORKBENCH\.md$' "$TMP_ROOT/rollback-dry-run.out"
 require_grep '^conflicts: 0$' "$TMP_ROOT/rollback-dry-run.out"
 
-node "$CLI" update --target "$TARGET_REPO" --apply > "$TMP_ROOT/rollback-apply.out"
+node "$BASE_CLI" update --target "$TARGET_REPO" --apply > "$TMP_ROOT/rollback-apply.out"
 require_grep '^Update apply completed\.$' "$TMP_ROOT/rollback-apply.out"
 reject_grep 'Adopt/update smoke forward change\.' "$TARGET_REPO/LLM_WORKBENCH.md"
 node - "$TARGET_REPO/.llm-workbench/lock.json" <<'NODE'
