@@ -43,7 +43,7 @@ const files = new Set(pack.files.map((file) => file.path));
 if (manifest.name !== 'llm-wb') {
   throw new Error(`unexpected package name: ${manifest.name}`);
 }
-if (manifest.version !== '0.1.0-beta.2') {
+if (manifest.version !== '0.1.0-beta.3') {
   throw new Error(`unexpected package version: ${manifest.version}`);
 }
 if (Object.prototype.hasOwnProperty.call(manifest, 'private')) {
