@@ -15,12 +15,12 @@ transcript_source:
 latest_context_packet_id:
 latest_context_packet_routing_summary:
 latest_context_packet_at_utc:
-latest_commit_at_utc:
-latest_commit_sha:
-chat_duration:
-estimated_chat_tokens:
-estimated_chat_cost:
-estimated_chat_cost_basis:
+latest_commit_at_utc: 2026-07-08T19:56:51Z
+latest_commit_sha: f5229ae
+chat_duration: 3402s (00:00:56:42)
+estimated_chat_tokens: unavailable; transcript source not supplied by chat
+estimated_chat_cost: unavailable; estimated chat tokens are unavailable
+estimated_chat_cost_basis: unavailable; estimated chat tokens are unavailable
 -->
 
 ## Initial Intent
@@ -95,9 +95,26 @@ Decision: Use direct-fallback when sub-agent support is unavailable
 
 Rationale: Keeps llm-workbench provider-neutral while still asking capable assistants to delegate implementation and git-action work.
 
+
+### 2026-07-08T19:56:51Z - Commit recorded
+
+Commit: `f5229ae`
+
+Message: Add sub-agent delegation tracking
+
+Summary: Adds provider-neutral sub-agent delegation guidance, direct-fallback recording, and session-log audit support for delegated implementation and git-action work.
+
+ADR impact: ADR not needed; narrow prompt/session-log behavior change within existing llm-workbench lifecycle patterns.
+
 ## Commits
 
-- None recorded yet.
+
+
+- Commit: `f5229ae`
+  Time UTC: 2026-07-08T19:56:51Z
+  Message: Add sub-agent delegation tracking
+  Summary: Adds provider-neutral sub-agent delegation guidance, direct-fallback recording, and session-log audit support for delegated implementation and git-action work.
+  ADR impact: ADR not needed; narrow prompt/session-log behavior change within existing llm-workbench lifecycle patterns.
 
 ## Main Refresh Conflicts
 
@@ -112,12 +129,12 @@ Reason: Narrow portable prompt and session-log recorder behavior; no durable arc
 ## Session Metrics
 
 Raised at UTC: 2026-07-08T19:00:09Z
-Latest commit at UTC:
-Latest commit SHA:
-Chat duration:
-Estimated chat tokens:
-Estimated chat cost:
-Estimated chat cost basis:
+Latest commit at UTC: 2026-07-08T19:56:51Z
+Latest commit SHA: f5229ae
+Chat duration: 3402s (00:00:56:42)
+Estimated chat tokens: unavailable; transcript source not supplied by chat
+Estimated chat cost: unavailable; estimated chat tokens are unavailable
+Estimated chat cost basis: unavailable; estimated chat tokens are unavailable
 
 ## Notes
 
