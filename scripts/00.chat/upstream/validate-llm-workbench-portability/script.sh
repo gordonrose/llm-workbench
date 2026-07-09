@@ -202,6 +202,12 @@ require_grep 'latest_context_packet_id:' \
   "$WORKBENCH_REPO/scripts/00.chat/startup/start-chat-session/script.sh"
 require_grep 'transcript_provider:' \
   "$WORKBENCH_REPO/scripts/00.chat/startup/start-chat-session/script.sh"
+require_grep '^## Context Hygiene$' \
+  "$WORKBENCH_REPO/scripts/00.chat/startup/start-chat-session/script.sh"
+require_grep 'context-hygiene' \
+  "$WORKBENCH_REPO/scripts/00.chat/session-log/update-chat-log/script.sh"
+require_grep 'require_section_entry "## Context Hygiene"' \
+  "$WORKBENCH_REPO/scripts/00.chat/session-log/prepare-chat-session-before-commit/script.sh"
 
 require_grep 'pbcopy' "$WORKBENCH_REPO/scripts/00.chat/startup/start-chat-session/script.sh"
 require_grep 'clip.exe' "$WORKBENCH_REPO/scripts/00.chat/startup/start-chat-session/script.sh"
@@ -228,6 +234,10 @@ require_grep 'CHAT_TRANSCRIPT_PROVIDER' "$WORKBENCH_REPO/docs/workflows.md"
     > "$TMP_ROOT/public-check-headers-all.out"
   bash scripts/00.chat/session-log/record-chat-commit/smoke-test.sh \
     > "$TMP_ROOT/public-record-chat-commit-smoke.out"
+  bash scripts/00.chat/session-log/update-chat-log/smoke-test.sh \
+    > "$TMP_ROOT/public-update-chat-log-smoke.out"
+  bash scripts/00.chat/session-log/prepare-chat-session-before-commit/smoke-test.sh \
+    > "$TMP_ROOT/public-prepare-chat-session-smoke.out"
   node scripts/00.chat/metrics/estimate-chat-cost/script.js 1024 \
     > "$TMP_ROOT/public-default-cost.out"
   CHAT_COST_PROFILE=openai-chat-latest-standard-conservative-output \

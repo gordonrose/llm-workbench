@@ -99,6 +99,9 @@ If there is uncommitted task work, follow .agentic/00.chat/workflows/chat-commit
 Ask for explicit approval before creating any task commit.
 After any task commit, record it with:
 bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-chat-commit/script.sh <sha> <message> <summary> [adr-impact]
+Before committing task work, record context hygiene with:
+bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/update-chat-log/script.sh context-hygiene <summary> <durable-evidence>
+After task commit recording and any narrow session-log checkpoint, run /compact before continuing the same chat into another implementation phase.
 
 Then follow .agentic/00.chat/workflows/chat-promote-to-main.md for local convergence.
 Run the required gates and verification before merging.

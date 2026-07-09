@@ -163,6 +163,10 @@ ${QUESTION}
 
 - None recorded yet.
 
+## Context Hygiene
+
+- None recorded yet.
+
 ## Activity Log
 
 ### ${RAISED_AT_UTC} - Session started

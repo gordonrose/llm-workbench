@@ -137,6 +137,10 @@ if ! grep -q '^## Sub-Agent Activity$' "$worktree_path/$session_log"; then
   fail "chat startup did not initialize the sub-agent activity section"
 fi
 
+if ! grep -q '^## Context Hygiene$' "$worktree_path/$session_log"; then
+  fail "chat startup did not initialize the context hygiene section"
+fi
+
 FAKE_BIN="$TMP_ROOT/fake-bin"
 mkdir -p "$FAKE_BIN"
 cat > "$FAKE_BIN/clip.exe" <<'EOF'

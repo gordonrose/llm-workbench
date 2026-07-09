@@ -113,6 +113,8 @@ require_file ".agentic/00.chat/workflows/chat-start.md"
 require_file "scripts/00.chat/startup/start-chat-session/script.sh"
 require_file "scripts/00.chat/session-log/record-chat-commit/script.sh"
 require_file "scripts/00.chat/session-log/prepare-chat-session-before-commit/script.sh"
+require_file "scripts/00.chat/session-log/prepare-chat-session-before-commit/smoke-test.sh"
+require_file "scripts/00.chat/session-log/update-chat-log/smoke-test.sh"
 require_file "scripts/00.chat/metrics/estimate-chat-cost/script.js"
 require_file "scripts/00.chat/metrics/data/chat-pricing.json"
 require_file "scripts/00.chat/metrics/data/chat-pricing.schema.json"
@@ -137,6 +139,12 @@ require_grep 'exec bash "\$COMMAND_SCRIPT" "\$@"' \
   "scripts/00.chat/command/dispatcher/script.sh"
 reject_grep 'chat command is not executable' \
   "scripts/00.chat/command/dispatcher/script.sh"
+require_grep '^## Context Hygiene$' \
+  "scripts/00.chat/startup/start-chat-session/script.sh"
+require_grep 'context-hygiene' \
+  "scripts/00.chat/session-log/update-chat-log/script.sh"
+require_grep 'require_section_entry "## Context Hygiene"' \
+  "scripts/00.chat/session-log/prepare-chat-session-before-commit/script.sh"
 
 if [ "$PUBLIC_MODE" = "yes" ]; then
   require_file "README.md"
