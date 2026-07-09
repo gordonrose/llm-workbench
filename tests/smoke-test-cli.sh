@@ -43,7 +43,7 @@ const files = new Set(pack.files.map((file) => file.path));
 if (manifest.name !== 'llm-wb') {
   throw new Error(`unexpected package name: ${manifest.name}`);
 }
-if (manifest.version !== '0.1.0-beta.3') {
+if (manifest.version !== '0.1.0-beta.4') {
   throw new Error(`unexpected package version: ${manifest.version}`);
 }
 if (Object.prototype.hasOwnProperty.call(manifest, 'private')) {
@@ -181,6 +181,10 @@ let text = fs.readFileSync(logPath, 'utf8');
 text = text.replace(
   '## Decisions Made\n\n- None recorded yet.',
   '## Decisions Made\n\n- CLI smoke recorded that this commit is safe to test.'
+);
+text = text.replace(
+  '## Context Hygiene\n\n- None recorded yet.',
+  '## Context Hygiene\n\n- Carry forward only the CLI smoke task commit, recorder output, and merge-main result.\n- Durable evidence: throwaway chat log, task commit, session checkpoint, and local main merge output.'
 );
 text = text.replace('ADR needed: unknown', 'ADR needed: no');
 text = text.replace('Reason:\n', 'Reason: CLI smoke change does not make a durable architecture decision.\n');
