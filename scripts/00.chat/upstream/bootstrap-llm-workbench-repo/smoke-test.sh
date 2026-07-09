@@ -86,7 +86,7 @@ for source_only_path in \
   test ! -e "$EMPTY_REPO/$source_only_path" ||
     fail "apply created source-maintenance harness script: $source_only_path"
 done
-node -e "const p=require(process.argv[1]); if (p.name !== 'llm-wb') process.exit(1); if (p.version !== '0.1.0-beta.4') process.exit(1); if (!p.scripts.chat) process.exit(1); if (!p.bin || Object.keys(p.bin).length !== 1 || p.bin['llm-wb'] !== 'bin/llm-workbench.js') process.exit(1)" "$EMPTY_REPO/package.json" || fail "created package.json did not match template"
+node -e "const p=require(process.argv[1]); if (p.name !== 'llm-wb') process.exit(1); if (p.version !== '0.1.0-beta.5') process.exit(1); if (!p.scripts.chat) process.exit(1); if (!p.bin || Object.keys(p.bin).length !== 1 || p.bin['llm-wb'] !== 'bin/llm-workbench.js') process.exit(1)" "$EMPTY_REPO/package.json" || fail "created package.json did not match template"
 
 PACKAGE_REPO="$TMP_ROOT/package"
 make_repo "$PACKAGE_REPO"

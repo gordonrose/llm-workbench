@@ -8,15 +8,16 @@ Do not add project-specific or procedural rules here.
 ## Before Acting
 
 0. Skip steps 1-7 if the user starts a chat with `ignore chat start`.
-1. Follow `.agentic/00.chat/workflows/chat-start.md`.
+1. Follow `.agentic/00.chat/workflows/chat-start.md` at the start of each
+   chat.
 2. Use the current branch's `commitLogs/<session>/README.md` session metadata
    as the first source of truth for chat lifecycle, branch, worktree, latest
    context packet references, commits, and metrics.
 <!-- deterministic-check: allow reason="prompt routing may be manual or repo-specific; no universal script can decide whether a context router exists" -->
-3. Do not assign the whole chat a durable layer, mode, or workflow. Use the
-   current user request, this repo's assistant instructions, and any
-   repo-provided context router if one exists when a prompt needs layer, mode,
-   workflow, corpus, or rule context.
+3. Do not assign the whole chat a durable layer, mode, or workflow. Use
+   prompt-level routing only when a prompt needs layer, mode, workflow, corpus,
+   or rule context; then use the current user request, this repo's assistant
+   instructions, and any available repo-provided context router.
 4. Use `chat_lifecycle_workflow` for chat startup/session lifecycle gates; use
    the latest context packet only as continuity evidence for future prompt-level
    context queries.
@@ -30,12 +31,11 @@ Do not add project-specific or procedural rules here.
 8. Follow shared approval rules before commits or destructive actions; never
    push, delete branches, rewrite history, discard work, or overwrite work
    without explicit user approval.
-9. Default mode is read-only after governed chat-start bootstrap. The
-   chat-start workflow may create or verify the chat branch, worktree, and
-   session log from the opening prompt without separate permission unless the
-   prompt starts with `ignore chat start`. Do not create, edit, move, delete,
-   stage, commit, or format task files unless the user explicitly grants write
-   permission for this chat.
+9. Governed chat-start may create or verify the chat branch, chat-owned
+   worktree, and session log from the opening prompt before task write
+   permission is granted unless the prompt starts with `ignore chat start`.
+   After bootstrap, task files remain read-only until the user explicitly
+   grants write permission.
 
 ## Operating Layers
 

@@ -212,7 +212,10 @@ if [ "$PUBLIC_MODE" = "yes" ]; then
     ".cursor/rules/llm-workbench.mdc" \
     "LLM_WORKBENCH.md"; do
     require_grep '\.agentic/00\.chat/workflows/chat-start\.md' "$adapter"
+    require_grep 'ignore chat start' "$adapter"
     require_grep 'Do not assign the whole chat a durable layer, mode, or workflow' "$adapter"
+    require_grep 'chat-owned' "$adapter"
+    require_grep 'After bootstrap, task files remain read-only' "$adapter"
     reject_grep 'RAG/rulebook runtime|RAG/rulebook routing|RAG queries' "$adapter"
   done
 else

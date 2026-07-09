@@ -78,7 +78,7 @@ const path = require('path');
 const root = process.argv[2];
 const packagePath = path.join(root, 'package.json');
 const manifest = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-manifest.version = '0.1.0-beta.4';
+manifest.version = '0.1.0-beta.5';
 fs.writeFileSync(packagePath, `${JSON.stringify(manifest, null, 2)}\n`);
 fs.appendFileSync(path.join(root, 'LLM_WORKBENCH.md'), '\nAdopt/update smoke forward change.\n');
 NODE
@@ -86,7 +86,7 @@ NODE
 node "$UPDATED_WORKBENCH/bin/llm-workbench.js" update --target "$TARGET_REPO" --dry-run \
   > "$TMP_ROOT/update-forward-dry-run.out"
 require_grep '^Current version: 0\.1\.0-beta\.1$' "$TMP_ROOT/update-forward-dry-run.out"
-require_grep '^Target version: 0\.1\.0-beta\.4$' "$TMP_ROOT/update-forward-dry-run.out"
+require_grep '^Target version: 0\.1\.0-beta\.5$' "$TMP_ROOT/update-forward-dry-run.out"
 require_grep '^UPDATE LLM_WORKBENCH\.md$' "$TMP_ROOT/update-forward-dry-run.out"
 require_grep '^conflicts: 0$' "$TMP_ROOT/update-forward-dry-run.out"
 require_grep '^No files changed\.$' "$TMP_ROOT/update-forward-dry-run.out"
@@ -99,13 +99,13 @@ require_grep 'Adopt/update smoke forward change\.' "$TARGET_REPO/LLM_WORKBENCH.m
 node - "$TARGET_REPO/.llm-workbench/lock.json" <<'NODE'
 const fs = require('fs');
 const lock = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
-if (lock.version !== '0.1.0-beta.4') {
+if (lock.version !== '0.1.0-beta.5') {
   throw new Error(`expected updated lock version, got ${lock.version}`);
 }
 NODE
 
 node "$BASE_CLI" update --target "$TARGET_REPO" --dry-run > "$TMP_ROOT/rollback-dry-run.out"
-require_grep '^Current version: 0\.1\.0-beta\.4$' "$TMP_ROOT/rollback-dry-run.out"
+require_grep '^Current version: 0\.1\.0-beta\.5$' "$TMP_ROOT/rollback-dry-run.out"
 require_grep '^Target version: 0\.1\.0-beta\.1$' "$TMP_ROOT/rollback-dry-run.out"
 require_grep '^UPDATE LLM_WORKBENCH\.md$' "$TMP_ROOT/rollback-dry-run.out"
 require_grep '^conflicts: 0$' "$TMP_ROOT/rollback-dry-run.out"
@@ -159,6 +159,9 @@ test ! -e "$ADOPT_REPO/.llm-workbench/manifest.json" || fail "adopt dry-run wrot
 node "$CLI" adopt --target "$ADOPT_REPO" --apply > "$TMP_ROOT/adopt-apply.out"
 require_grep '^Adopt apply completed\.$' "$TMP_ROOT/adopt-apply.out"
 require_grep 'llm-workbench:start' "$ADOPT_REPO/AGENTS.md"
+require_grep 'ignore chat start' "$ADOPT_REPO/AGENTS.md"
+require_grep 'chat-owned worktree' "$ADOPT_REPO/AGENTS.md"
+require_grep 'After bootstrap, task files remain read-only' "$ADOPT_REPO/AGENTS.md"
 test -f "$ADOPT_REPO/.llm-workbench/lock.json" || fail "adopt apply did not write lock"
 test -f "$ADOPT_REPO/.llm-workbench/manifest.json" || fail "adopt apply did not write manifest"
 test -f "$ADOPT_REPO/src/product.txt" || fail "adopt apply removed local product file"
