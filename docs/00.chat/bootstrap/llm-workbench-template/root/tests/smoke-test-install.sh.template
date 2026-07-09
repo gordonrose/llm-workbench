@@ -10,6 +10,15 @@ cleanup() {
 }
 trap cleanup EXIT
 
+require_grep() {
+  local pattern="$1"
+  local path="$2"
+  grep -Eq -- "$pattern" "$path" || {
+    echo "ERROR: missing pattern '$pattern' in $path" >&2
+    exit 1
+  }
+}
+
 mkdir -p "$TARGET_REPO"
 git -C "$TARGET_REPO" init -q --initial-branch=main
 git -C "$TARGET_REPO" config user.name "llm-workbench smoke test"
@@ -28,6 +37,18 @@ test -d "$TARGET_REPO/scripts/00.chat"
 test -d "$TARGET_REPO/scripts/01.harness"
 test ! -e "$TARGET_REPO/docs/00.chat/public-chat-workbench-adrs.md"
 test ! -e "$TARGET_REPO/docs/harness/architecture/adrs"
+
+for adapter in \
+  "$TARGET_REPO/AGENTS.md" \
+  "$TARGET_REPO/CLAUDE.md" \
+  "$TARGET_REPO/.github/copilot-instructions.md" \
+  "$TARGET_REPO/.cursor/rules/llm-workbench.mdc" \
+  "$TARGET_REPO/LLM_WORKBENCH.md"; do
+  require_grep '\.agentic/00\.chat/workflows/chat-start\.md' "$adapter"
+  require_grep 'ignore chat start' "$adapter"
+  require_grep 'chat-owned' "$adapter"
+  require_grep 'After bootstrap, task files remain read-only' "$adapter"
+done
 
 for required_path in \
   scripts/01.harness/run-governed-script.sh \

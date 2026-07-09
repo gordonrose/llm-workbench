@@ -2,15 +2,22 @@
 
 This repo uses the `llm-workbench` chat harness.
 
-At the start of a chat, follow `.agentic/00.chat/workflows/chat-start.md`.
+At the start of each chat, follow `.agentic/00.chat/workflows/chat-start.md`.
+`ignore chat start` skips governed startup.
+
 Use the current branch's `commitLogs/<session>/README.md` as the first source
 of truth for chat lifecycle, branch, worktree, context-packet references,
 commits, and metrics.
 
-Do not assign the whole chat a durable layer, mode, or workflow. When a prompt
-needs layer, mode, workflow, corpus, or rule context, use the current user
-request, this repo's assistant instructions, and any repo-provided context
-router if one exists.
+Do not assign the whole chat a durable layer, mode, or workflow. Use
+prompt-level routing only when a prompt needs layer, mode, workflow, corpus, or
+rule context; then use the current user request, this repo's assistant
+instructions, and any available repo-provided context router.
+
+Governed chat-start may create or verify the chat branch, chat-owned worktree,
+and session log from the opening prompt before task write permission is
+granted. After bootstrap, task files remain read-only until the user explicitly
+grants write permission.
 
 Do not push, rewrite history, discard work, or overwrite work without explicit
 human approval.
