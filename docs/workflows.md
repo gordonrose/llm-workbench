@@ -34,6 +34,9 @@ Commit preparation is governed by:
 
 The before-commit gates check prerequisites, session log safety, deterministic
 process drift, metadata headers, and governed command drift.
+Before task commits, the session log must include context hygiene: a compact
+summary of what should survive from noisy file reads, command output, diffs,
+logs, errors, and tool calls.
 
 The public CLI shortcut is:
 
@@ -43,6 +46,9 @@ llm-wb commit -m "Describe the completed work"
 
 This wraps the existing commit gates, creates the task commit, records it in the
 session log, and checkpoints session evidence.
+If you continue the same chat into another implementation phase after that
+checkpoint, run `/compact` so Codex keeps the commit summary, decisions,
+unresolved issues, and context hygiene instead of raw intermediate output.
 
 Transcript metrics are provider-neutral. Codex can use the bundled transcript
 adapter; other assistants can provide values with `CHAT_TRANSCRIPT_PROVIDER`,
