@@ -8,19 +8,19 @@ worktree: /tmp/agentic-chat-worktrees/llm-workbench-3325971775/chat_2026-07-09-1
 chat_lifecycle_workflow: .agentic/00.chat/workflows/chat-start.md
 status: ready
 raised_at_utc: 2026-07-09T15:04:31Z
-transcript_provider:
-transcript_path:
-transcript_bytes:
-transcript_source:
+transcript_provider: 
+transcript_path: 
+transcript_bytes: 
+transcript_source: 
 latest_context_packet_id:
 latest_context_packet_routing_summary:
 latest_context_packet_at_utc:
-latest_commit_at_utc:
-latest_commit_sha:
-chat_duration:
-estimated_chat_tokens:
-estimated_chat_cost:
-estimated_chat_cost_basis:
+latest_commit_at_utc: 2026-07-09T16:11:24Z
+latest_commit_sha: f7ef3e8
+chat_duration: 4013s (00:01:06:53)
+estimated_chat_tokens: unavailable; transcript source not supplied by chat
+estimated_chat_cost: unavailable; estimated chat tokens are unavailable
+estimated_chat_cost_basis: unavailable; estimated chat tokens are unavailable
 -->
 
 ## Initial Intent
@@ -107,6 +107,17 @@ ADR needed: no
 
 Reason: Clarifies existing public startup contract wording and release metadata; no new harness architecture decision was introduced.
 
+
+### 2026-07-09T16:11:24Z - Commit recorded
+
+Commit: `f7ef3e8`
+
+Message: Clarify managed assistant startup block
+
+Summary: Clarified managed assistant startup instructions for greenfield and existing consumer repos, aligned thin adapter/template files, strengthened install/adopt/portability assertions, and bumped llm-wb to 0.1.0-beta.5 for publish.
+
+ADR impact: no ADR needed: existing startup contract clarified without new architecture decision
+
 ## Sub-Agent Activity
 
 
@@ -126,7 +137,13 @@ Summary: Updated managed llm-workbench startup block and copied adapter template
 
 ## Commits
 
-- None recorded yet.
+
+
+- Commit: `f7ef3e8`
+  Time UTC: 2026-07-09T16:11:24Z
+  Message: Clarify managed assistant startup block
+  Summary: Clarified managed assistant startup instructions for greenfield and existing consumer repos, aligned thin adapter/template files, strengthened install/adopt/portability assertions, and bumped llm-wb to 0.1.0-beta.5 for publish.
+  ADR impact: no ADR needed: existing startup contract clarified without new architecture decision
 
 ## Main Refresh Conflicts
 
@@ -141,12 +158,12 @@ Reason: Clarifies existing public startup contract wording and release metadata;
 ## Session Metrics
 
 Raised at UTC: 2026-07-09T15:04:31Z
-Latest commit at UTC:
-Latest commit SHA:
-Chat duration:
-Estimated chat tokens:
-Estimated chat cost:
-Estimated chat cost basis:
+Latest commit at UTC: 2026-07-09T16:11:24Z
+Latest commit SHA: f7ef3e8
+Chat duration: 4013s (00:01:06:53)
+Estimated chat tokens: unavailable; transcript source not supplied by chat
+Estimated chat cost: unavailable; estimated chat tokens are unavailable
+Estimated chat cost basis: unavailable; estimated chat tokens are unavailable
 
 ## Notes
 
