@@ -15,9 +15,9 @@ transcript_source:
 latest_context_packet_id:
 latest_context_packet_routing_summary:
 latest_context_packet_at_utc:
-latest_commit_at_utc: 2026-10-22T16:56:09Z
-latest_commit_sha: 335af7c5869921f4725fbb3454810f4364d0c572
-chat_duration: 1174s (00:00:19:34)
+latest_commit_at_utc: 2026-10-22T17:01:09Z
+latest_commit_sha: 2e611bd46c0c0cf243f4938db8aa25f5382a74c3
+chat_duration: 1474s (00:00:24:34)
 estimated_chat_tokens: unavailable; transcript source not supplied by chat
 estimated_chat_cost: unavailable; estimated chat tokens are unavailable
 estimated_chat_cost_basis: unavailable; estimated chat tokens are unavailable
@@ -45,6 +45,10 @@ Remove blanket dirty worktree confirmation while preserving operation safeguards
 - Raised: npm publishing authentication requires sign-in
   Resolution: Read-only npm whoami returned E401 Unauthorized. Asked user to run npm login against registry.npmjs.org while authorized Git/release preparation continues. No credentials were requested in chat or printed.
 
+
+- Raised: Resolved: npm publishing authentication and beta.6 publication
+  Resolution: The earlier E401 and pending sign-in notes are historical and superseded. Browser login and the npm publication authorization challenge completed successfully; npm publish exited 0 with + llm-wb@0.1.0-beta.6. Registry propagation completed and the version plus latest tag are now verified. No authentication or publication blocker remains; credentials were not printed or stored in this log.
+
 ## Decisions Made
 
 
@@ -62,6 +66,14 @@ Remove blanket dirty worktree confirmation while preserving operation safeguards
 
 - Summary: Release beta.6 package and version checks passed
   Durable evidence: Passed: npm run test:install; bash tests/smoke-test-cli.sh; bash tests/smoke-test-adopt-update.sh; governed bootstrap-llm-workbench-repo smoke; governed record-sub-agent-activity smoke; shell syntax and whitespace; npm publish --dry-run --tag latest --json. Package dry-run contained 189 files, 150336 packed bytes, and 669236 unpacked bytes. It includes the new startup policy/regression and excludes session logs, Git data, credentials and private configuration. Version fixtures were first proved to fail before bumping beta.5 to beta.6; beta.1 rollback fixtures remain. Earlier public-beta and independent safeguards checks passed. npm authentication remains E401 even outside the sandbox; publication waits for user sign-in.
+
+
+- Summary: Upstream chat refreshed for final release receipt without changing published task content
+  Durable evidence: Fetched origin before comparison; main and origin/main both 382111442a9e76a83e46733ed3bae66dcf098b11. Initial classifier clean; dirty paths none; incoming content/overlap paths none; original chat head 9d8a049e88ed891a636ff0c0a8afbef13e42c30a. Governed preflight branch agentic/preflight/chat-2026-10-22-17-36-remove-blanket-dirty-workt-9d8a049e88ed/20261022170022 at /tmp/agentic-main-refresh-preflight/chat-2026-10-22-17-36-remove-blanket-dirty-workt-9d8a049e88ed-20261022170022 merged cleanly. Conflict audit passed with no conflicts; preflight/main tree 8cb0fce9ae97f9801764262a7cbd7aa89fe7d64b matched exactly, so existing passing task/release validation remains applicable; whitespace check passed. Applied commit 2e611bd46c0c0cf243f4938db8aa25f5382a74c3 fast-forwarded the chat; governed apply removed the clean temporary worktree and preflight branch. Stash=no. Root main was not changed or pushed. Only session bookkeeping is now dirty; final checkpoint waits for publication result.
+
+
+- Summary: llm-wb 0.1.0-beta.6 publication verified; release complete
+  Durable evidence: Published at 2026-10-22T17:02:52.603Z with latest=0.1.0-beta.6 and gitHead=382111442a9e76a83e46733ed3bae66dcf098b11. Registry dist.shasum=2de084785d19c6462c77cf5be4957e1910675025 matches the validated precommit dry-run tarball. Registry dist.integrity=sha512-nPGtQ5qliHcPmvN0Pxyye3dPRx0Z41ebCw8hA4vgPMOgg0Bz50dkcV2qDKqHv3W501BKuqJ8b3OoeFl4y/WEnw==. Independently verified using npm view llm-wb@0.1.0-beta.6 version dist-tags gitHead dist.shasum dist.integrity time --json --cache /tmp/llm-wb-release-audit-npm-cache. A brief initial registry E404 during package processing resolved before this verification. Published content includes the removed blanket dirty-worktree gate and preserved operation-specific safeguards. Only this receipt and refresh bookkeeping follow the published source commit; package source/version/tag are unchanged. Previous npm-authentication blocker is resolved.
 
 ## Activity Log
 
@@ -141,6 +153,51 @@ Summary: Replace blanket dirty-worktree confirmation with existing-change preser
 
 ADR impact: Public workflow and docs record replacement policy; source-repo ADR0040 supersedes historical ADR0005.
 
+
+### 2026-10-22T17:01:09Z - Commit recorded
+
+Commit: `2e611bd46c0c0cf243f4938db8aa25f5382a74c3`
+
+Message: Merge main into chat through governed preflight
+
+Summary: Rehearsed and applied an authorized non-rewriting refresh from main 382111442a9e76a83e46733ed3bae66dcf098b11. Preflight and main trees are identical; no conflicts or task-file changes. Session evidence remains ready for final npm publication receipt.
+
+ADR impact: No new architecture decision; branch maintenance only.
+
+
+### 2026-10-22T17:01:09Z - Context hygiene
+
+Summary: Upstream chat refreshed for final release receipt without changing published task content
+
+Durable evidence: Fetched origin before comparison; main and origin/main both 382111442a9e76a83e46733ed3bae66dcf098b11. Initial classifier clean; dirty paths none; incoming content/overlap paths none; original chat head 9d8a049e88ed891a636ff0c0a8afbef13e42c30a. Governed preflight branch agentic/preflight/chat-2026-10-22-17-36-remove-blanket-dirty-workt-9d8a049e88ed/20261022170022 at /tmp/agentic-main-refresh-preflight/chat-2026-10-22-17-36-remove-blanket-dirty-workt-9d8a049e88ed-20261022170022 merged cleanly. Conflict audit passed with no conflicts; preflight/main tree 8cb0fce9ae97f9801764262a7cbd7aa89fe7d64b matched exactly, so existing passing task/release validation remains applicable; whitespace check passed. Applied commit 2e611bd46c0c0cf243f4938db8aa25f5382a74c3 fast-forwarded the chat; governed apply removed the clean temporary worktree and preflight branch. Stash=no. Root main was not changed or pushed. Only session bookkeeping is now dirty; final checkpoint waits for publication result.
+
+
+### 2026-10-22T17:04:43Z - Issue
+
+Raised: Resolved: npm publishing authentication and beta.6 publication
+
+Resolution: The earlier E401 and pending sign-in notes are historical and superseded. Browser login and the npm publication authorization challenge completed successfully; npm publish exited 0 with + llm-wb@0.1.0-beta.6. Registry propagation completed and the version plus latest tag are now verified. No authentication or publication blocker remains; credentials were not printed or stored in this log.
+
+
+### 2026-10-22T17:04:43Z - Context hygiene
+
+Summary: llm-wb 0.1.0-beta.6 publication verified; release complete
+
+Durable evidence: Published at 2026-10-22T17:02:52.603Z with latest=0.1.0-beta.6 and gitHead=382111442a9e76a83e46733ed3bae66dcf098b11. Registry dist.shasum=2de084785d19c6462c77cf5be4957e1910675025 matches the validated precommit dry-run tarball. Registry dist.integrity=sha512-nPGtQ5qliHcPmvN0Pxyye3dPRx0Z41ebCw8hA4vgPMOgg0Bz50dkcV2qDKqHv3W501BKuqJ8b3OoeFl4y/WEnw==. Independently verified using npm view llm-wb@0.1.0-beta.6 version dist-tags gitHead dist.shasum dist.integrity time --json --cache /tmp/llm-wb-release-audit-npm-cache. A brief initial registry E404 during package processing resolved before this verification. Published content includes the removed blanket dirty-worktree gate and preserved operation-specific safeguards. Only this receipt and refresh bookkeeping follow the published source commit; package source/version/tag are unchanged. Previous npm-authentication blocker is resolved.
+
+
+### 2026-10-22T17:04:43Z - Sub-agent activity recorded
+
+Agent: gate_removal_scope
+
+Status: completed
+
+Delegation mode: sub-agent
+
+Fallback used: no
+
+Scope: Governed chat refresh and verified npm publication receipt preparation
+
 ## Sub-Agent Activity
 
 
@@ -172,6 +229,20 @@ Blockers: npm login required for actual publish
 Next step: Supervising agent commits, merges and pushes approved changes; publish after authentication
 Summary: Updated six version/template/fixture files; validated install, CLI, forward update, rollback, bootstrap and package contents.
 
+
+### 2026-10-22T17:04:43Z - gate_removal_scope
+
+Status: completed
+Delegation mode: sub-agent
+Fallback used: no
+Scope: Governed chat refresh and verified npm publication receipt preparation
+Files touched: Current chat session log only after the branch refresh; no package or version changes.
+Checks run: Remote fetch; clean classifier; no changed-path overlaps; preflight tree identical to published main; no conflicts; audit passed; whitespace passed; npm view verifies beta.6/latest/gitHead/shasum/integrity/publication time.
+Git actions: Governed preflight created refresh commit 2e611bd46c0c0cf243f4938db8aa25f5382a74c3 and apply fast-forwarded chat; temporary clean preflight branch/worktree removed by apply. Root main unchanged during preparation.
+Blockers: None; npm authentication and publication are resolved.
+Next step: Checkpoint only the current log, verify merge readiness, merge receipt to clean root main and push under existing user authorization.
+Summary: Refreshed the chat through conflict-free preflight/audit/apply, recorded the refresh commit, resolved the earlier authentication issue in the log, and independently verified published beta.6 registry metadata against the validated artifact.
+
 ## Commits
 
 
@@ -181,6 +252,13 @@ Summary: Updated six version/template/fixture files; validated install, CLI, for
   Message: fix(chat): remove blanket dirty-worktree gate and prepare beta.6
   Summary: Replace blanket dirty-worktree confirmation with existing-change preservation policy; preserve operation safeguards, add dirty-source regression coverage and prepare llm-wb 0.1.0-beta.6. All required policy/release validations passed.
   ADR impact: Public workflow and docs record replacement policy; source-repo ADR0040 supersedes historical ADR0005.
+
+
+- Commit: `2e611bd46c0c0cf243f4938db8aa25f5382a74c3`
+  Time UTC: 2026-10-22T17:01:09Z
+  Message: Merge main into chat through governed preflight
+  Summary: Rehearsed and applied an authorized non-rewriting refresh from main 382111442a9e76a83e46733ed3bae66dcf098b11. Preflight and main trees are identical; no conflicts or task-file changes. Session evidence remains ready for final npm publication receipt.
+  ADR impact: No new architecture decision; branch maintenance only.
 
 ## Main Refresh Conflicts
 
@@ -195,9 +273,9 @@ Reason: No separate upstream ADR corpus is exported. The canonical chat-start wo
 ## Session Metrics
 
 Raised at UTC: 2026-10-22T16:36:35Z
-Latest commit at UTC: 2026-10-22T16:56:09Z
-Latest commit SHA: 335af7c5869921f4725fbb3454810f4364d0c572
-Chat duration: 1174s (00:00:19:34)
+Latest commit at UTC: 2026-10-22T17:01:09Z
+Latest commit SHA: 2e611bd46c0c0cf243f4938db8aa25f5382a74c3
+Chat duration: 1474s (00:00:24:34)
 Estimated chat tokens: unavailable; transcript source not supplied by chat
 Estimated chat cost: unavailable; estimated chat tokens are unavailable
 Estimated chat cost basis: unavailable; estimated chat tokens are unavailable
