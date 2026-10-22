@@ -141,23 +141,28 @@ context-router query returns a packet. Record only the latest context packet ID,
 routing summary, and timestamp as continuity references. Do not copy the
 packet's prompt route into chat session `layer`, `mode`, or `workflow` fields.
 
-## Dirty Worktree
+## Existing Changes
 
-Before editing files, run:
+Uncommitted changes are normal during a chat. Their presence alone does not
+block read-only inspection or task edits already authorized by the user.
 
-```bash
-bash scripts/00.chat/worktree/dirty-worktree-check/script.sh
-```
+Before editing, inspect `git status --short` and the relevant diffs in the
+chat-owned worktree recorded in the session log. Preserve existing changes,
+including staged and untracked work, and keep unrelated work out of task staging
+and commits. Continue work that is within the authorized scope.
 
-<!-- deterministic-check: allow reason="dirty-worktree-check.sh detects dirty state; workflow defines the exact blocked response" -->
-If dirty, respond exactly:
+<!-- deterministic-check: allow reason="whether proposed edits conflict with existing work or have unclear ownership requires task and diff judgment" -->
+Pause only the affected action when it would overwrite or conflict with
+existing work, or when ownership or intended content is unclear. Explain the
+specific files and decision needed; continue independent authorized work.
 
-```txt
-Blocked: dirty worktree. Confirm proceed?
-```
+Bootstrap worktree status describes the source worktree before the new chat
+worktree was created. It is informational and does not imply those changes
+belong to the new chat. Leave source work in place.
 
-Do not explain unless asked.
-Do not edit files while blocked.
+Write permission, chat-worktree ownership, explicit git approvals, and the
+operation-specific checks for merge, refresh, and cleanup still apply. A dirty
+status does not authorize stashing, discarding, committing, or overwriting work.
 
 ## Write Requests Without A Chat Worktree
 
