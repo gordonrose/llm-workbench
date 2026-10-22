@@ -232,6 +232,8 @@ require_grep 'CHAT_TRANSCRIPT_PROVIDER' "$WORKBENCH_REPO/docs/workflows.md"
     > "$TMP_ROOT/public-contract-check.out"
   bash scripts/01.harness/artifact-metadata/check-headers/script.sh --all \
     > "$TMP_ROOT/public-check-headers-all.out"
+  bash scripts/00.chat/startup/start-chat-session/smoke-test.sh \
+    > "$TMP_ROOT/public-start-chat-session-smoke.out"
   bash scripts/00.chat/session-log/record-chat-commit/smoke-test.sh \
     > "$TMP_ROOT/public-record-chat-commit-smoke.out"
   bash scripts/00.chat/session-log/update-chat-log/smoke-test.sh \

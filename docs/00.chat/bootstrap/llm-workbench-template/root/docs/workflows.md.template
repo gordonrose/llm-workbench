@@ -21,6 +21,12 @@ llm-wb new --json "Describe the prompt"
 The JSON packet includes the session log, chat-owned worktree, lifecycle
 workflow, latest context-packet references, and first prompt.
 
+Uncommitted changes alone do not stop a chat or require another confirmation.
+The bootstrap status describes the source worktree; a new chat has its own
+worktree. Authorized edits preserve existing work, with clarification for
+concrete overlaps or unclear ownership. Merge, refresh, and cleanup still apply
+their own checks. See the [existing-change policy](../.agentic/00.chat/workflows/chat-start.md#existing-changes).
+
 Use `npx llm-wb ...` instead of `llm-wb ...` when the CLI is not installed
 globally or linked into your shell.
 

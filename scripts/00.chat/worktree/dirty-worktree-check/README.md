@@ -20,11 +20,10 @@
 -->
 # Dirty Worktree Check
 
-`script.sh` reports whether the current worktree is clean enough for the next
-governed step.
-
-It is intentionally small: it answers one question before startup, refresh,
-commit, or promotion workflows continue.
+`script.sh` classifies the current worktree. Its output is evidence for the
+calling workflow, which decides whether its specific operation can proceed.
+It does not impose a confirmation gate on ordinary inspection or authorized
+task edits.
 
 ## Modes
 
@@ -55,8 +54,10 @@ Dirty state is not always bad. Sometimes the only dirty file is the session log
 after a task commit has been recorded. That is expected bookkeeping and can be
 checkpointed separately.
 
-Other dirty state is ambiguous. This helper stops workflows before they
-accidentally continue across unreviewed or unrelated changes.
+Task edits also normally make a worktree dirty. Follow the existing-change
+guidance in `.agentic/00.chat/workflows/chat-start.md#existing-changes` to preserve
+that work and resolve concrete overlaps. Merge, refresh, and cleanup retain
+their operation-specific safeguards.
 
 ## What This Does Not Do
 

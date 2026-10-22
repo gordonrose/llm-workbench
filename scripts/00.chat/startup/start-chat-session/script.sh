@@ -225,10 +225,8 @@ Latest context packet id:
 Latest context packet routing summary:
 Bootstrap worktree status: ${WORKTREE_STATUS}
 
-If Bootstrap worktree status is dirty, reply exactly:
-Blocked: dirty worktree. Confirm proceed?
-
-Before that response, do not read workflows or run git status/dirty checks.
+Bootstrap worktree status is informational; existing changes alone do not require confirmation.
+For preservation and overlap handling, follow .agentic/00.chat/workflows/chat-start.md#existing-changes.
 
 Governed startup bootstrap has already created this chat branch, worktree, and session log.
 Default mode after startup bootstrap: read-only until I grant write permission in this chat.
