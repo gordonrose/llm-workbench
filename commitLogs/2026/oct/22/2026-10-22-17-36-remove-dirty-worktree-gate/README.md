@@ -8,19 +8,19 @@ worktree: /tmp/agentic-chat-worktrees/llm-workbench-3325971775/chat_2026-10-22-1
 chat_lifecycle_workflow: .agentic/00.chat/workflows/chat-start.md
 status: ready
 raised_at_utc: 2026-10-22T16:36:35Z
-transcript_provider:
-transcript_path:
-transcript_bytes:
-transcript_source:
+transcript_provider: 
+transcript_path: 
+transcript_bytes: 
+transcript_source: 
 latest_context_packet_id:
 latest_context_packet_routing_summary:
 latest_context_packet_at_utc:
-latest_commit_at_utc:
-latest_commit_sha:
-chat_duration:
-estimated_chat_tokens:
-estimated_chat_cost:
-estimated_chat_cost_basis:
+latest_commit_at_utc: 2026-10-22T16:56:09Z
+latest_commit_sha: 335af7c5869921f4725fbb3454810f4364d0c572
+chat_duration: 1174s (00:00:19:34)
+estimated_chat_tokens: unavailable; transcript source not supplied by chat
+estimated_chat_cost: unavailable; estimated chat tokens are unavailable
+estimated_chat_cost_basis: unavailable; estimated chat tokens are unavailable
 -->
 
 ## Initial Intent
@@ -130,6 +130,17 @@ Fallback used: no
 
 Scope: llm-wb beta.6 version preparation and publication dry-run
 
+
+### 2026-10-22T16:56:09Z - Commit recorded
+
+Commit: `335af7c5869921f4725fbb3454810f4364d0c572`
+
+Message: fix(chat): remove blanket dirty-worktree gate and prepare beta.6
+
+Summary: Replace blanket dirty-worktree confirmation with existing-change preservation policy; preserve operation safeguards, add dirty-source regression coverage and prepare llm-wb 0.1.0-beta.6. All required policy/release validations passed.
+
+ADR impact: Public workflow and docs record replacement policy; source-repo ADR0040 supersedes historical ADR0005.
+
 ## Sub-Agent Activity
 
 
@@ -163,7 +174,13 @@ Summary: Updated six version/template/fixture files; validated install, CLI, for
 
 ## Commits
 
-- None recorded yet.
+
+
+- Commit: `335af7c5869921f4725fbb3454810f4364d0c572`
+  Time UTC: 2026-10-22T16:56:09Z
+  Message: fix(chat): remove blanket dirty-worktree gate and prepare beta.6
+  Summary: Replace blanket dirty-worktree confirmation with existing-change preservation policy; preserve operation safeguards, add dirty-source regression coverage and prepare llm-wb 0.1.0-beta.6. All required policy/release validations passed.
+  ADR impact: Public workflow and docs record replacement policy; source-repo ADR0040 supersedes historical ADR0005.
 
 ## Main Refresh Conflicts
 
@@ -178,12 +195,12 @@ Reason: No separate upstream ADR corpus is exported. The canonical chat-start wo
 ## Session Metrics
 
 Raised at UTC: 2026-10-22T16:36:35Z
-Latest commit at UTC:
-Latest commit SHA:
-Chat duration:
-Estimated chat tokens:
-Estimated chat cost:
-Estimated chat cost basis:
+Latest commit at UTC: 2026-10-22T16:56:09Z
+Latest commit SHA: 335af7c5869921f4725fbb3454810f4364d0c572
+Chat duration: 1174s (00:00:19:34)
+Estimated chat tokens: unavailable; transcript source not supplied by chat
+Estimated chat cost: unavailable; estimated chat tokens are unavailable
+Estimated chat cost basis: unavailable; estimated chat tokens are unavailable
 
 ## Notes
 
