@@ -133,11 +133,14 @@ set_adr_disposition() {
   awk -v needed="$needed" -v path="$path" -v reason="$reason" '
     BEGIN {
       in_adr = 0
+      found = 0
       saw_needed = 0
       saw_path = 0
       saw_reason = 0
+      path_line = path == "" ? "ADR path:" : "ADR path: " path
     }
     $0 == "## ADR Disposition" {
+      found = 1
       in_adr = 1
       print
       next
@@ -147,7 +150,7 @@ set_adr_disposition() {
         print "ADR needed: " needed
       }
       if (saw_path == 0) {
-        print "ADR path: " path
+        print path_line
       }
       if (saw_reason == 0) {
         print "Reason: " reason
@@ -160,7 +163,7 @@ set_adr_disposition() {
       next
     }
     in_adr && /^ADR path:/ {
-      print "ADR path: " path
+      print path_line
       saw_path = 1
       next
     }
@@ -173,12 +176,19 @@ set_adr_disposition() {
       print
     }
     END {
-      if (in_adr == 1) {
+      if (found == 0) {
+        print ""
+        print "## ADR Disposition"
+        print ""
+        print "ADR needed: " needed
+        print path_line
+        print "Reason: " reason
+      } else if (in_adr == 1) {
         if (saw_needed == 0) {
           print "ADR needed: " needed
         }
         if (saw_path == 0) {
-          print "ADR path: " path
+          print path_line
         }
         if (saw_reason == 0) {
           print "Reason: " reason

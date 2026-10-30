@@ -258,12 +258,14 @@ const records = logs.map((filePath) => {
     durationSeconds: parseDurationSeconds(data.chat_duration),
     tokens: parseTokenCount(data.estimated_chat_tokens),
     cost: parseUsdCost(data.estimated_chat_cost),
+    hasActivityAccounting: /^## Activity Accounting$/m.test(content),
   };
 });
 
 const durationStats = metricStats(records.map((record) => record.durationSeconds));
 const tokenStats = metricStats(records.map((record) => record.tokens));
 const costStats = metricStats(records.map((record) => record.cost));
+const activityAccountingCount = records.filter((record) => record.hasActivityAccounting).length;
 
 const lines = [
   '# Commit Log Summary',
@@ -283,6 +285,12 @@ const lines = [
   '## Estimated Chat Cost',
   '',
   metricTable(costStats, formatUsd),
+  '',
+  '## Activity Accounting Coverage',
+  '',
+  `Session READMEs with activity accounting: ${activityAccountingCount}/${records.length}`,
+  '',
+  'Activity accounting entries are parent-recorded explanatory evidence, not normalized time, token, cost, or verification metrics. Inspect the cited session README and its trusted receipts before comparing efficiency.',
   '',
 ];
 

@@ -107,6 +107,13 @@ commit logs that record commits or are explicitly marked for retention.
 - Issues raised during the chat are summarized with their resolutions, or
   explicitly recorded as none.
 - Decisions made during the chat are summarized, or explicitly recorded as none.
+- `## Activity Accounting` has proportionate parent-owned entries for completed
+  or interrupted material work slices. Preserve observed UTC boundaries and
+  unavailable measurements; do not reconstruct historical timing or add
+  overlapping sub-agent work to wall time.
+- Failed and corrected attempts identify the observed problem, supported cause
+  or hypothesis, correction, and repeated proof. Verification reuse/deferment
+  points to its trusted receipt and preserves stage boundaries.
 - Context hygiene is summarized before task commits. Record only the durable
   carry-forward from noisy file reads, command output, diffs, logs, errors, and
   tool calls unless raw evidence is needed to prevent repeat mistakes.

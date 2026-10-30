@@ -167,6 +167,17 @@ ${QUESTION}
 
 - None recorded yet.
 
+## Activity Accounting
+
+- Parent-owned journal. Record a concise entry at meaningful phase transitions
+  and slice completion; do not record every message or command.
+- Use observed UTC timestamps and measured command durations where available.
+  Keep session elapsed, work-slice elapsed, command duration, concurrent work,
+  and waiting distinct; do not add overlapping intervals as wall time.
+- Record failed, interrupted, and uncertain work separately from success.
+  Reuse trusted verification reports rather than rerunning checks for timing.
+- No entries recorded yet.
+
 ## Activity Log
 
 ### ${RAISED_AT_UTC} - Session started
@@ -235,6 +246,7 @@ For implementation, file-edit, test, or git-action work, delegate to a sub-agent
 The supervising agent keeps responsibility for approval boundaries, write location, final review, and the final response.
 After delegated or direct-fallback work, record it with:
 bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-sub-agent-activity/script.sh --mode <sub-agent|direct-fallback> --status <completed|blocked|failed> --agent <label> --scope <scope> --summary <summary> --files <files> --checks <checks> --git-actions <git-actions> --blockers <blockers> --next-step <next-step>
+After write permission, record meaningful phase transitions and completed work slices in this same session README with scripts/00.chat/session-log/record-activity-accounting/script.sh. Use safe report references, preserve unavailable measurements, and do not turn polling waits into command durations.
 Return a summary covering delegation mode, fallback use, files changed, checks run, git actions, blockers, and next step.
 For prompt-level routing, use the current user request, this repo's assistant instructions, and any repo-provided context router if one exists. Do not assign the whole chat a durable layer, mode, or workflow.
 Do not commit without my explicit approval."

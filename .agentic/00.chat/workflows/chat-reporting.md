@@ -65,5 +65,8 @@ bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat
 - Prefer stdout for quick inspection.
 - If the requested report needs interpretation beyond deterministic metrics,
   cite the source session logs used.
+- Activity-accounting coverage is a discovery aid only. Do not sum journal
+  intervals, treat prose as a trusted verification receipt, or compare
+  efficiency without inspecting the source session README and its cited reports.
 - If a requested report would need new persistent generated files, stop and ask
   whether the harness should define that artifact first.

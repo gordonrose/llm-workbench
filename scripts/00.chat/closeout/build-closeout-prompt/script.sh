@@ -95,6 +95,7 @@ For implementation, file-edit, test, or git-action work, delegate to a sub-agent
 The supervising agent keeps responsibility for approval boundaries, write location, final review, and the final response.
 After delegated or direct-fallback work, record it with:
 bash scripts/01.harness/run-governed-script.sh --approved-action scripts/00.chat/session-log/record-sub-agent-activity/script.sh --mode <sub-agent|direct-fallback> --status <completed|blocked|failed> --agent <label> --scope <scope> --summary <summary> --files <files> --checks <checks> --git-actions <git-actions> --blockers <blockers> --next-step <next-step>
+Before closeout, consolidate meaningful work slices in the existing session README with scripts/00.chat/session-log/record-activity-accounting/script.sh. Preserve UTC observations, unavailable measurements, failed/corrected attempts, trusted verification reuse, deferred obligations, and overlap without double-counting wall time. Do not record secrets or raw command arguments.
 If there is uncommitted task work, follow .agentic/00.chat/workflows/chat-commit.md and .agentic/00.chat/checklists/before-commit.md.
 Ask for explicit approval before creating any task commit.
 After any task commit, record it with:

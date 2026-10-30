@@ -101,4 +101,18 @@ grep -q '^  Durable evidence: Durable evidence lives in the task commit and sess
 grep -q '^### .* - Context hygiene$' "$LOG_FILE" \
   || fail "context hygiene activity entry was not recorded"
 
+bash -c 'cd "$1" && shift && "$@"' sh "$REPO" \
+  bash scripts/00.chat/session-log/update-chat-log/script.sh adr-disposition not-needed \
+    "No durable architecture decision was made." >/dev/null
+
+grep -q '^ADR needed: no$' "$LOG_FILE" \
+  || fail "ADR disposition was not recorded"
+
+grep -q '^ADR path:$' "$LOG_FILE" \
+  || fail "empty ADR path retained trailing whitespace"
+
+if grep -nE '[[:blank:]]$' "$LOG_FILE" >/dev/null; then
+  fail "session log contains trailing whitespace"
+fi
+
 echo "update chat log smoke test passed."
