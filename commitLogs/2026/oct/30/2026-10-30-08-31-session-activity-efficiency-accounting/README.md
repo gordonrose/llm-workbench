@@ -10,17 +10,17 @@ status: ready
 raised_at_utc: 2026-10-30T08:31:35Z
 transcript_provider: codex
 transcript_path: /home/owner/.codex/sessions/2026/10/30/rollout-2026-10-30T08-31-30-01a18bef-7ced-7322-b4f5-337d7a84e7fb.jsonl
-transcript_bytes:
-transcript_source:
+transcript_bytes: 150944
+transcript_source: codex path: /home/owner/.codex/sessions/2026/10/30/rollout-2026-10-30T08-31-30-01a18bef-7ced-7322-b4f5-337d7a84e7fb.jsonl
 latest_context_packet_id:
 latest_context_packet_routing_summary:
 latest_context_packet_at_utc:
-latest_commit_at_utc:
-latest_commit_sha:
-chat_duration:
-estimated_chat_tokens:
-estimated_chat_cost:
-estimated_chat_cost_basis:
+latest_commit_at_utc: 2026-10-30T09:04:50Z
+latest_commit_sha: d6afb7b
+chat_duration: 1995s (00:00:33:15)
+estimated_chat_tokens: 37736 estimated from chat transcript bytes (150944 bytes; source: codex path: /home/owner/.codex/sessions/2026/10/30/rollout-2026-10-30T08-31-30-01a18bef-7ced-7322-b4f5-337d7a84e7fb.jsonl)
+estimated_chat_cost: unavailable; no pricing profile selected
+estimated_chat_cost_basis: unavailable; set CHAT_COST_PROFILE or CHAT_COST_PRICING_FILE
 -->
 
 ## Initial Intent
@@ -83,13 +83,30 @@ Summary: Activity accounting is implemented through the startup README template,
 
 Durable evidence: Durable evidence: current session README; recorder smoke test; /tmp/llm-wb-beta7-final-{portability,cli,install,adopt-update}.out; /tmp/llm-wb-beta7-pack.json.
 
+
+### 2026-10-30T09:04:50Z - Commit recorded
+
+Commit: `d6afb7b`
+
+Message: feat: add session activity accounting
+
+Summary: Added parent-owned session README activity accounting, validation, lifecycle integration, report coverage, and public beta.7 package release support.
+
+ADR impact: covered by session ADR disposition
+
 ## Sub-Agent Activity
 
 - None recorded yet.
 
 ## Commits
 
-- None recorded yet.
+
+
+- Commit: `d6afb7b`
+  Time UTC: 2026-10-30T09:04:50Z
+  Message: feat: add session activity accounting
+  Summary: Added parent-owned session README activity accounting, validation, lifecycle integration, report coverage, and public beta.7 package release support.
+  ADR impact: covered by session ADR disposition
 
 ## Main Refresh Conflicts
 
@@ -104,12 +121,12 @@ Reason: This is an additive implementation of existing session-log lifecycle own
 ## Session Metrics
 
 Raised at UTC: 2026-10-30T08:31:35Z
-Latest commit at UTC:
-Latest commit SHA:
-Chat duration:
-Estimated chat tokens:
-Estimated chat cost:
-Estimated chat cost basis:
+Latest commit at UTC: 2026-10-30T09:04:50Z
+Latest commit SHA: d6afb7b
+Chat duration: 1995s (00:00:33:15)
+Estimated chat tokens: 37736 estimated from chat transcript bytes (150944 bytes; source: codex path: /home/owner/.codex/sessions/2026/10/30/rollout-2026-10-30T08-31-30-01a18bef-7ced-7322-b4f5-337d7a84e7fb.jsonl)
+Estimated chat cost: unavailable; no pricing profile selected
+Estimated chat cost basis: unavailable; set CHAT_COST_PROFILE or CHAT_COST_PRICING_FILE
 
 ## Notes
 
