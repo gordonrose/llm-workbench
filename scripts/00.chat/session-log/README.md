@@ -23,11 +23,15 @@
 
 Session-log scripts read and update the durable evidence for a chat. The
 session log records task intent, branch/worktree metadata, workflow routing,
-activity, decisions, issues, sub-agent activity, commits, conflicts, and
-metrics.
+activity accounting, decisions, issues, sub-agent activity, commits, conflicts,
+and metrics.
 
 These scripts are part of why chats are auditable. They should update only the
 current chat's log unless a workflow explicitly says otherwise.
 
 The helper libraries in this domain provide shared path and metadata parsing
 for other chat capabilities.
+
+`record-activity-accounting` keeps bounded, parent-owned explanations of work
+slices in the existing session README. It does not replace trusted verification
+reports, transcript metrics, or the existing sub-agent handoff record.

@@ -141,6 +141,10 @@ if ! grep -q '^## Context Hygiene$' "$worktree_path/$session_log"; then
   fail "chat startup did not initialize the context hygiene section"
 fi
 
+if ! grep -q '^## Activity Accounting$' "$worktree_path/$session_log"; then
+  fail "chat startup did not initialize the activity accounting section"
+fi
+
 FAKE_BIN="$TMP_ROOT/fake-bin"
 mkdir -p "$FAKE_BIN"
 cat > "$FAKE_BIN/clip.exe" <<'EOF'
@@ -189,6 +193,10 @@ fi
 
 if ! grep -q 'record-sub-agent-activity/script.sh' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
   fail "first prompt did not name the sub-agent activity recorder"
+fi
+
+if ! grep -q 'record-activity-accounting/script.sh' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then
+  fail "first prompt did not name the activity accounting recorder"
 fi
 
 if ! grep -q 'Return a summary covering delegation mode, fallback use, files changed, checks run, git actions, blockers, and next step.' "$TMP_ROOT/chat-worktree-session-clipboard.out"; then

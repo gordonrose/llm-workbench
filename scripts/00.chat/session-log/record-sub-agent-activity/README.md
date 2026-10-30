@@ -38,3 +38,10 @@ Supported modes are:
 
 This command only writes the current session log. It does not stage files,
 commit, merge, push, or approve work.
+
+The parent remains responsible for consolidated `## Activity Accounting`. Ask a
+sub-agent to supply safe interval boundaries, measured command durations,
+waiting, failures, corrections, verification receipt references, and overlap in
+its handoff. Record the handoff here, then have the parent record the relevant
+slice using `record-activity-accounting`; never add an overlapping child interval
+to session wall time.

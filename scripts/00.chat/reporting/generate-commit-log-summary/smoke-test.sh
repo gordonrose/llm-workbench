@@ -50,6 +50,10 @@ chat_duration: 42s
 estimated_chat_tokens: 100 tokens
 estimated_chat_cost: USD 0.0030 estimated from estimated_chat_tokens
 -->
+
+## Activity Accounting
+
+- Example parent-owned entry.
 EOF
 
 (
@@ -88,6 +92,14 @@ fi
 
 if ! grep -q '| Total | USD 0.0030 |' "$TMP_ROOT/printed.md"; then
   fail "summary did not aggregate estimated chat cost"
+fi
+
+if ! grep -q 'Session READMEs with activity accounting: 1/1' "$TMP_ROOT/printed.md"; then
+  fail "summary did not report activity accounting coverage"
+fi
+
+if ! grep -q 'not normalized time, token, cost, or verification metrics' "$TMP_ROOT/printed.md"; then
+  fail "summary did not preserve activity accounting limits"
 fi
 
 echo "commit log summary smoke test passed."

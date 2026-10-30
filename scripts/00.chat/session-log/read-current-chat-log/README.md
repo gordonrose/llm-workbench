@@ -42,3 +42,8 @@ bash scripts/00.chat/session-log/read-current-chat-log/script.sh --allow-recorde
 
 only after the user explicitly approves continuing the existing chat session and
 worktree.
+
+When continuation is approved, retain the existing `## Activity Accounting`
+entries and continue the same named work slice. Record an open or interrupted
+interval honestly; a new date or context refresh does not create a new session
+or justify a historical timing backfill.

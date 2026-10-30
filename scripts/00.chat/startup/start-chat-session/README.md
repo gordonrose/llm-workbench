@@ -135,8 +135,11 @@ to present or pass the session packet in their own way.
 
    The log is created at
    `commitLogs/<year>/<month>/<day>/<session>/README.md` inside the new
-   worktree. It starts with machine-readable session metadata and human-readable
-   sections for activity, decisions, issues, commits, conflicts, and metrics.
+worktree. It starts with machine-readable session metadata and human-readable
+sections for activity accounting, activity, decisions, issues, commits,
+conflicts, and metrics. Activity accounting is a concise parent-owned journal
+of meaningful work slices; it supplements rather than redefines chat duration,
+transcript, token, cost, or verification-receipt metrics.
 
 7. Offer a chat worktree window.
 
